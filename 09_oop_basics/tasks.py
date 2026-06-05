@@ -148,7 +148,7 @@ student = Student("Petia", 17)
 student = Student("Vova", 16)
 student  = Student("Sveta", 18)
 n=0
-while student<3:
+while student:
     print(student.name)
     print(student.age)
     n+1

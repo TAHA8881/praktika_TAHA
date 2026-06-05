@@ -37,6 +37,19 @@ schema.sql
 # TODO: добавить функцию подключения к БД
 
 
+import os
+import psycopg2
+
+
+def get_connection():
+    return psycopg2.connect(
+        host=os.getenv("DB_HOST", "localhost"),
+        port=os.getenv("DB_PORT", "5432"),
+        dbname=os.getenv("DB_NAME", "clothing_store"),
+        user=os.getenv("DB_USER", "postgres"),
+        password=os.getenv("DB_PASSWORD", "postgres"),
+    )
+
 # Задание 4
 # Подготовьте SQL-схему первых таблиц:
 # категории, товары, остатки товаров по размерам и покупатели.

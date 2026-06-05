@@ -16,6 +16,32 @@
 
 
 # TODO: импортировать модели для работы репозиториев
+import os
+import psycopg2
+
+from importlib import import_module
+from pathlib import Path
+import sys
+
+PROJECT_ROOT = Path (__file__).resolve().parents[2]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.append(str(PROJECT_ROOT))
+
+domain_models = import_module("17_clothing_store_project.01_domain_models.tasks")
+Product = domain_models.Product
+Category = domain_models.Category
+LeftSizes = domain_models.LeftSizes
+Byer = domain_models.Byer
+
+def get_connection():
+    return psycopg2.connect(
+        host=os.getenv("DB_HOST", "localhost"),
+        port=os.getenv("DB_PORT", "5432"),
+        dbname=os.getenv("DB_NAME", "clothing_store"),
+        user=os.getenv("DB_USER", "postgres"),
+        password=os.getenv("DB_PASSWORD", "postgres"),
+    )
 
 
 # Задание 2
@@ -25,7 +51,36 @@
 
 # TODO: подключить репозитории к готовому соединению
 
+class SomeRepository:
+    def __init__(self, connection):
+        self.connection = connection
 
+    def add(self, book):
+        query = """
+            INSERT INTO books (id, title, author)
+            VALUES (%s, %s, %s)
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (book.book_id, book.title, book.author))
+
+        self.connection.commit()
+
+    def get_by_id(self, book_id):
+        query = """
+            SELECT id, title, author
+            FROM books
+            WHERE id = %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (book_id,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return Book(row[0], row[1], row[2])
 # Задание 3
 # Создайте репозиторий категорий.
 # Он должен добавлять категорию, находить ее по идентификатору и возвращать список категорий.
