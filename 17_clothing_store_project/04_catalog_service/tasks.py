@@ -266,7 +266,23 @@ class SomeRepository:
 
         self.connection.commit()
 
-    def get_by_id_p(self, category_id):
+    def get_by_id_p(self, id):
+        query = """
+            SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
+            FROM category_id
+            WHERE id = %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (id,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
+    
+    def get_by_id_p_a(self, is_active):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
             FROM category_id
@@ -294,7 +310,7 @@ class SomeRepository:
 
         self.connection.commit()
 
-    def get_by_id_ls(self, category_id):
+    def get_by_id_ls(self, store_id):
         query = """
             SELECT store_id, product_id, size, quantity
             FROM store_id
@@ -302,7 +318,7 @@ class SomeRepository:
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (category_id,))
+            cursor.execute(query, (store_id,))
             row = cursor.fetchone()
 
         if row is None:
@@ -362,7 +378,7 @@ print(byer)
 # TODO: добавить сервис каталога
 
 
-# Задание 3✔
+# Задание 3
 # Добавьте получение активных товаров.
 # Неактивные товары не должны попадать в обычную выдачу каталога.
 
