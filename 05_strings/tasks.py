@@ -9,7 +9,10 @@
 
 
 # TODO: решение
-
+print("№1")
+word=input("слово: ")
+print(word[0])
+print(word[-1])
 
 # Задание 2
 # Спросите у пользователя строку.
@@ -17,7 +20,10 @@
 
 
 # TODO: решение
-
+print(" ")
+print("№2")
+stroka=input("Выведите строку: ")
+print(len(stroka)) 
 
 # Задание 3
 # Спросите у пользователя имя.
@@ -26,7 +32,12 @@
 
 
 # TODO: решение
-
+print(" ")
+print("№3")
+name=input("выведите имя: ")
+n=(name.strip())
+print(n.capitalize())
+  # убрать пробелы по краям
 
 # Задание 4
 # Спросите у пользователя предложение.
@@ -34,7 +45,12 @@
 
 
 # TODO: решение
-
+print(" ")
+print("№4")
+i=0
+predlo=input("Выведите предложение: ")
+p = predlo.lower().count('a')
+print(p)
 
 # Задание 5
 # Спросите у пользователя строку.
@@ -44,7 +60,13 @@
 
 
 # TODO: решение
-
+print(" ")
+print("№5")
+stroka=input("Выведите строку: ")
+if "Python" in stroka:
+    print("Python найден")
+else:
+    print("Python не найден")
 
 # Задание 6
 # Спросите у пользователя слово.
@@ -54,3 +76,12 @@
 
 
 # TODO: решение
+print(" ")
+print("№6")
+word = input("Выведите слово: ")
+a=word[::-1]
+print(a) 
+if word==a:
+    print("является палиндромом")
+else:
+    print('не является палиндроном')

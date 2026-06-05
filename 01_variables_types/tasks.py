@@ -12,7 +12,12 @@
 # Выведите каждую переменную на экран.
 
 
-# TODO: решение
+# TODO:
+print("№1")
+name = "Tanya"
+age = 18
+town = "Moskow"
+print(name, age, town)
 
 
 # Задание 2
@@ -20,8 +25,11 @@
 # Выведите их сумму, разность, произведение и частное.
 
 
-# TODO: решение
-
+# TODO:
+print("№2")
+a = 10
+b =2
+print(a+b, a-b, a*b, a//b)
 
 # Задание 3
 # Создайте переменную temperature со значением 36.6.
@@ -29,6 +37,9 @@
 
 
 # TODO: решение
+print("№3")
+temperature = 36.6
+print(type(temperature))  # <class 'int'>
 
 
 # Задание 4
@@ -39,7 +50,9 @@
 number_text = "123"
 
 # TODO: решение
-
+print("№4")
+number = int(number_text)
+print(number)
 
 # Задание 5
 # Создайте переменные width и height.
@@ -47,7 +60,10 @@ number_text = "123"
 
 
 # TODO: решение
-
+print("№5")
+width = 3
+height = 5
+print("площадь треугольника:", a*b/2)
 
 # Задание 6
 # Создайте переменную seconds с количеством секунд.
@@ -56,3 +72,8 @@ number_text = "123"
 
 
 # TODO: решение
+print("№6")
+seconds = 5
+p = seconds//60
+o = seconds%60
+print(p,'час', o, 'мин')

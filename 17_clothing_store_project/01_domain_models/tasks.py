@@ -15,7 +15,40 @@
 
 
 # TODO: добавить модель категории
+class ClothingStore:
+    def __init__(self, product, category, size, still_left_size, buyer, order):
+        if product == "":
+            raise ValueError("Имя товара не может быть пустым")
 
+        if "@" not in email:
+            raise ValueError("Некорректный email")
+
+        if age < 16:
+            raise ValueError("Возраст студента не может быть меньше 16")
+
+        self.student_id = student_id
+        self.full_name = full_name
+        self.email = email
+        self.age = age
+
+'''class Student:
+    def __init__(self, student_id, full_name, email, age):
+        if student_id <= 0:
+            raise ValueError("Идентификатор должен быть положительным")
+
+        if full_name == "":
+            raise ValueError("Имя студента не может быть пустым")
+
+        if "@" not in email:
+            raise ValueError("Некорректный email")
+
+        if age < 16:
+            raise ValueError("Возраст студента не может быть меньше 16")
+
+        self.student_id = student_id
+        self.full_name = full_name
+        self.email = email
+        self.age = age'''
 
 # Задание 2
 # Опишите модель товара.
