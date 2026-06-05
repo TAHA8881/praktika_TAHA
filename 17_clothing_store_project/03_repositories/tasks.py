@@ -51,36 +51,130 @@ def get_connection():
 
 # TODO: подключить репозитории к готовому соединению
 
+'''
+Category =  (self, category_id, category_name, category_description):
+Product =   (self, id, product_name, category_id, price, color, description, is_active):
+LeftSizes = (self, store_id, product_id, size, quantity):
+Byer =      (self, byer_id, byer_name, byer_email, byer_telephone):
+'''
+
 class SomeRepository:
     def __init__(self, connection):
         self.connection = connection
 
-    def add(self, book):
+    def add_categories(self, categories):
         query = """
-            INSERT INTO books (id, title, author)
+            INSERT INTO categories (category_id, category_name, category_description)
             VALUES (%s, %s, %s)
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (book.book_id, book.title, book.author))
+            cursor.execute(query, (categories.category_id, categories.category_name, categories.category_description))
 
         self.connection.commit()
 
-    def get_by_id(self, book_id):
+    def get_by_id_c(self, category_id):
         query = """
-            SELECT id, title, author
+            SELECT category_id, category_name, category_description
             FROM books
             WHERE id = %s
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (book_id,))
+            cursor.execute(query, (category_id,))
             row = cursor.fetchone()
 
         if row is None:
             return None
 
-        return Book(row[0], row[1], row[2])
+        return Category(row[0], row[1], row[2])
+    
+
+#-Product-------------------------------------------------------------------------------------------------------------------
+    def add_product(self, product):
+        query = """
+            INSERT INTO product (product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active)
+            VALUES (%s, %s, %s)
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active))
+
+        self.connection.commit()
+
+    def get_by_id_p(self, category_id):
+        query = """
+            SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
+            FROM category_id
+            WHERE id = %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (id,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
+    
+#-LeftSizes--------------------------------------------------------------------------------------------------------------------------------------
+    def add_left_sizes(self, left_sizes):
+        query = """
+            INSERT INTO product (store_id, product_id, size, quantity)
+            VALUES (%s, %s, %s)
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (left_sizes.store_id, left_sizes.product_id, left_sizes.size, left_sizes.quantity))
+
+        self.connection.commit()
+
+    def get_by_id_ls(self, category_id):
+        query = """
+            SELECT store_id, product_id, size, quantity
+            FROM store_id
+            WHERE id = %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (category_id,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return LeftSizes(row[0], row[1], row[2], row[3])
+    
+#-Byer-------------------------------------------------------------------------------------------------------------------
+    def add_byer(self, byer):
+        query = """
+            INSERT INTO product (byer_id, byer_name, byer_email, byer_telephone)
+            VALUES (%s, %s, %s)
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (byer.byer_id, byer.byer_name, byer.byer_email, byer.byer_telephone))
+
+        self.connection.commit()
+
+    def get_by_id_b(self, byer_id):
+        query = """
+            SELECT byer_id, byer_name, byer_email, byer_telephone
+            FROM byer_id
+            WHERE id = %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (byer_id,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return Byer(row[0], row[1], row[2], row[3])
+ 
+
 # Задание 3
 # Создайте репозиторий категорий.
 # Он должен добавлять категорию, находить ее по идентификатору и возвращать список категорий.
@@ -128,3 +222,12 @@ class SomeRepository:
 
 
 # TODO: добавить ручную проверку репозиториев с реальной БД
+category = Category(1,"Юбки","Женская одежда")
+product = Product(1, "Короткая юбка",1 , 1000, "серая", "Юбка выше колен", "Продан")
+left_sizes = LeftSizes(1, 1, "XL", 5)
+byer = Byer (1, "Ivan", "Ivan@rambler.ru", "+79154908888")
+
+print(category)
+print(product)
+print(left_sizes)
+print(byer)
