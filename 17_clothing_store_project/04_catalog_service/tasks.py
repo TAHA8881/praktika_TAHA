@@ -240,8 +240,8 @@ class SomeRepository:
     def get_by_id_c(self, category_id):
         query = """
             SELECT category_id, category_name, category_description
-            FROM books
-            WHERE id = %s
+            FROM category_id
+            WHERE category_id = %s
         """
 
         with self.connection.cursor() as cursor:
@@ -253,7 +253,22 @@ class SomeRepository:
 
         return Category(row[0], row[1], row[2])
     
+    def get_by_id_c_id(self, category_name):
+        query = """
+            SELECT category_name, category_name, category_description
+            FROM category_name
+            WHERE category_name = %s
+        """
 
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (category_name,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return Category(row[0], row[1], row[2])
+    
 #-Product-------------------------------------------------------------------------------------------------------------------
     def add_product(self, product):
         query = """
@@ -269,12 +284,44 @@ class SomeRepository:
     def get_by_id_p(self, id):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
-            FROM category_id
+            FROM id
             WHERE id = %s
         """
 
         with self.connection.cursor() as cursor:
             cursor.execute(query, (id,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
+    
+    def get_by_a(self, is_active):
+        query = """
+            SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
+            FROM is_active
+            WHERE is_active = %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (is_active,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
+    
+    def get_by_p_n(self, product_name):
+        query = """
+            SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
+            FROM product_name
+            WHERE product_name = %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (product_name,))
             row = cursor.fetchone()
 
         if row is None:
@@ -285,12 +332,12 @@ class SomeRepository:
     def get_by_id_p_a(self, is_active):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
-            FROM category_id
-            WHERE id = %s
+            FROM is_active
+            WHERE is_active = %s
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (id,))
+            cursor.execute(query, (is_active,))
             row = cursor.fetchone()
 
         if row is None:
@@ -298,6 +345,37 @@ class SomeRepository:
 
         return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
     
+    def get_by_c(self, color):
+        query = """
+            SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
+            FROM color
+            WHERE color = %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (color,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
+    
+    def get_by_p(self, min_price, max_price):
+        query = """
+            SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
+            FROM product
+            WHERE price BETWEEN %s AND %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (min_price, max_price,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
 #-LeftSizes--------------------------------------------------------------------------------------------------------------------------------------
     def add_left_sizes(self, left_sizes):
         query = """
@@ -314,7 +392,7 @@ class SomeRepository:
         query = """
             SELECT store_id, product_id, size, quantity
             FROM store_id
-            WHERE id = %s
+            WHERE store_id = %s
         """
 
         with self.connection.cursor() as cursor:
@@ -342,7 +420,7 @@ class SomeRepository:
         query = """
             SELECT byer_id, byer_name, byer_email, byer_telephone
             FROM byer_id
-            WHERE id = %s
+            WHERE byer_id = %s
         """
 
         with self.connection.cursor() as cursor:
@@ -378,7 +456,7 @@ print(byer)
 # TODO: добавить сервис каталога
 
 
-# Задание 3
+# Задание 3 ✔
 # Добавьте получение активных товаров.
 # Неактивные товары не должны попадать в обычную выдачу каталога.
 
@@ -386,7 +464,7 @@ print(byer)
 # TODO: добавить выдачу активных товаров
 
 
-# Задание 4 
+# Задание 4 ✔
 # Добавьте поиск по части названия.
 # Поиск должен быть удобным для пользователя и не зависеть от регистра.
 
@@ -395,7 +473,7 @@ print(byer)
 
 
 # Задание 5
-# Добавьте фильтрацию по категории, размеру, цвету и диапазону цены.
+# Добавьте фильтрацию по категории, размеру, цвету ✔ и диапазону цены.
 # Фильтр по размеру должен учитывать наличие товара именно этого размера.
 # Фильтры можно реализовать постепенно.
 
