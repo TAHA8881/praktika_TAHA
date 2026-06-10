@@ -58,8 +58,8 @@ class Product:
             raise ValueError("Цвет товара не может быть пустым")
         if  description == "":
             raise ValueError("Описание товара не может быть пустым")
-        if  is_active == "":
-            raise ValueError("Активность товара не может быть пустым")
+        if not isinstance(is_active, bool):
+            raise ValueError("Активность товара должна быть булевым значением (True/False)")
         
         self.id = id
         self.product_name = product_name

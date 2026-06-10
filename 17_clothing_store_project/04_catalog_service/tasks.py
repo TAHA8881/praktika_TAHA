@@ -59,8 +59,8 @@ class Product:
             raise ValueError("Цвет товара не может быть пустым")
         if  description == "":
             raise ValueError("Описание товара не может быть пустым")
-        if  is_active == "":
-            raise ValueError("Активность товара не может быть пустым")
+        if not isinstance(is_active, bool):
+            raise ValueError("Активность товара должна быть булевым значением (True/False)")
         
         self.id = id
         self.product_name = product_name
@@ -180,12 +180,12 @@ def get_connection():
 
 
 
-import os
-import psycopg2
+#import os
+#import psycopg2
 
-from importlib import import_module
-from pathlib import Path
-import sys
+#from importlib import import_module
+#from pathlib import Path
+#import sys
 
 PROJECT_ROOT = Path (__file__).resolve().parents[2]
 
@@ -228,7 +228,7 @@ class SomeRepository:
 
     def add_categories(self, categories):
         query = """
-            INSERT INTO categories (category_id, category_name, category_description)
+            INSERT INTO categoriy (category_id, category_name, category_description)
             VALUES (%s, %s, %s)
         """
 
@@ -255,7 +255,7 @@ class SomeRepository:
     
     def get_by_id_c_id(self, category_name):
         query = """
-            SELECT category_name, category_name, category_description
+            SELECT category_id, category_name, category_description
             FROM category
             WHERE category_name = %s
         """
@@ -273,7 +273,7 @@ class SomeRepository:
     def add_product(self, product):
         query = """
             INSERT INTO product (product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active)
-            VALUES (%s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
         with self.connection.cursor() as cursor:
@@ -297,23 +297,24 @@ class SomeRepository:
 
         return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
     
-    def get_by_a(self, is_active):
+    def get__by_active_status(self, is_active):
+
+        if not isinstance(is_active, bool):
+            raise ValueError("is_active должен быть булевым значением")
+    
         query = """
-            SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
+            SELECT id, product_name, category_id, price, color, description, is_active
             FROM product
             WHERE is_active = %s
         """
-
+    
         with self.connection.cursor() as cursor:
             cursor.execute(query, (is_active,))
-            row = cursor.fetchone()
-
-        if row is None:
-            return None
-
+            row = cursor.fetchall()  
+    
         return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
     
-    def get_by_p_n(self, product_name):
+def get_by_p_n(self, product_name):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
             FROM product
@@ -451,7 +452,7 @@ class SomeRepository:
 #---------------------------------------------------------------------------------------------------------
 
 category = Category(1,"Юбки","Женская одежда")
-product = Product(1, "Короткая юбка",1 , 1000, "серая", "Юбка выше колен", "Продан")
+product = Product(1, "Короткая юбка",1 , 1000, "серая", "Юбка выше колен", False)
 left_sizes = LeftSizes(1, 1, "XL", 5)
 byer = Byer (1, "Ivan", "Ivan@rambler.ru", "+79154908888")
 
@@ -488,7 +489,7 @@ print(byer)
 # TODO: добавить поиск по названию
 
 
-# Задание 5
+# Задание 5 ✔ 
 # Добавьте фильтрацию по категории ✔ , размеру ✔, цвету ✔ и диапазону цены ✔ .
 # Фильтр по размеру должен учитывать наличие товара именно этого размера.
 # Фильтры можно реализовать постепенно.
@@ -497,7 +498,7 @@ print(byer)
 # TODO: добавить фильтрацию каталога
 
 
-# Задание 6
+# Задание 6 ✔ 
 # Добавьте сортировку найденных товаров.
 # Продумайте варианты сортировки по цене и названию.
 
