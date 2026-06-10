@@ -240,7 +240,7 @@ class SomeRepository:
     def get_by_id_c(self, category_id):
         query = """
             SELECT category_id, category_name, category_description
-            FROM category_id
+            FROM category
             WHERE category_id = %s
         """
 
@@ -256,7 +256,7 @@ class SomeRepository:
     def get_by_id_c_id(self, category_name):
         query = """
             SELECT category_name, category_name, category_description
-            FROM category_name
+            FROM category
             WHERE category_name = %s
         """
 
@@ -284,7 +284,7 @@ class SomeRepository:
     def get_by_id_p(self, id):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
-            FROM id
+            FROM product
             WHERE id = %s
         """
 
@@ -300,7 +300,7 @@ class SomeRepository:
     def get_by_a(self, is_active):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
-            FROM is_active
+            FROM product
             WHERE is_active = %s
         """
 
@@ -316,7 +316,7 @@ class SomeRepository:
     def get_by_p_n(self, product_name):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
-            FROM product_name
+            FROM product
             WHERE product_name = %s
         """
 
@@ -332,7 +332,7 @@ class SomeRepository:
     def get_by_id_p_a(self, is_active):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
-            FROM is_active
+            FROM product
             WHERE is_active = %s
         """
 
@@ -348,7 +348,7 @@ class SomeRepository:
     def get_by_c(self, color):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
-            FROM color
+            FROM product
             WHERE color = %s
         """
 
@@ -391,12 +391,28 @@ class SomeRepository:
     def get_by_id_ls(self, store_id):
         query = """
             SELECT store_id, product_id, size, quantity
-            FROM store_id
+            FROM left_sizes
             WHERE store_id = %s
         """
 
         with self.connection.cursor() as cursor:
             cursor.execute(query, (store_id,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return LeftSizes(row[0], row[1], row[2], row[3])
+    
+    def get_by_size(self, size):
+        query = """
+            SELECT store_id, product_id, size, quantity
+            FROM left_sizes
+            WHERE size = %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (size,))
             row = cursor.fetchone()
 
         if row is None:
@@ -419,7 +435,7 @@ class SomeRepository:
     def get_by_id_b(self, byer_id):
         query = """
             SELECT byer_id, byer_name, byer_email, byer_telephone
-            FROM byer_id
+            FROM byer
             WHERE byer_id = %s
         """
 
@@ -473,7 +489,7 @@ print(byer)
 
 
 # Задание 5
-# Добавьте фильтрацию по категории, размеру, цвету ✔ и диапазону цены.
+# Добавьте фильтрацию по категории ✔ , размеру ✔, цвету ✔ и диапазону цены ✔ .
 # Фильтр по размеру должен учитывать наличие товара именно этого размера.
 # Фильтры можно реализовать постепенно.
 
