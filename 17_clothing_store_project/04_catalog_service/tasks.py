@@ -314,7 +314,7 @@ class SomeRepository:
     
         return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
     
-def get_by_p_n(self, product_name):
+    def get_by_p_n(self, product_name):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
             FROM product
