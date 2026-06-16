@@ -32,7 +32,7 @@
 
 
 # TODO: добавить модель позиции заказа
-class ModelZakaza:
+class PoziciaZakaza:
     def __init__id__(self, product, product_name, size, price, quantity):
         self.product = product
         self.product_name = product_name
@@ -50,7 +50,7 @@ class OpisanieZakaza:
     STATUSES = ["создан", "оплачен", 'передан в доставку', 'выполнен', 'выполнен', 'отменен']
 
     def __init__id__(self, id, byer, product, total_price, status):
-        
+
         self.product = product
         self.id = id
         self.byer = byer
@@ -73,7 +73,7 @@ class OpisanieZakaza:
 
 
 
-# Задание 5
+# Задание 5 есть
 # Создайте репозиторий заказов.
 # Он должен сохранять заказ и позиции заказа в PostgreSQL,
 # а также позволять получить историю заказов покупателя.

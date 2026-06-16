@@ -41,9 +41,22 @@ CREATE TABLE byer (
 -- Следующие таблицы понадобятся на следующих этапах проекта.
 
 -- TODO: таблица заказов
-
+CREATE TABLE order (
+    id INTEGER PRIMARY KEY,
+    users_id INTEGER NOT NULL REFERENCES users(id),
+    total INTEGER NOT NULL CHEK(TOTAL >= 0),
+	status TEXT NOT NULL
+);
 -- TODO: таблица позиций заказа
 
+CREATE TABLE order_items (
+    id INTEGER PRIMARY KEY,
+    order_id INTEGER NOT NULL REFERENCES order(id),
+    clothes_id INTEGER NOT NULL REFERENCES order(id),
+    clothes_name TEXT NOT NULL,
+	size TEXT NOT NULL,
+   quantity INTEGER NOT NULL (quantity = 0),
+);
 -- TODO: таблица адресов доставки
 
 -- TODO: таблица промокодов
