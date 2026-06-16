@@ -187,11 +187,6 @@ def get_connection():
 #from pathlib import Path
 #import sys
 
-PROJECT_ROOT = Path (__file__).resolve().parents[2]
-
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.append(str(PROJECT_ROOT))
-
 domain_models = import_module("17_clothing_store_project.01_domain_models.tasks")
 Product = domain_models.Product
 Category = domain_models.Category
@@ -215,20 +210,13 @@ def get_connection():
 
 # TODO: подключить репозитории к готовому соединению
 
-'''
-Category =  (self, category_id, category_name, category_description):
-Product =   (self, id, product_name, category_id, price, color, description, is_active):
-LeftSizes = (self, store_id, product_id, size, quantity):
-Byer =      (self, byer_id, byer_name, byer_email, byer_telephone):
-'''
-
-class SomeRepository:
+class CategoryRepository:
     def __init__(self, connection):
         self.connection = connection
 
     def add_categories(self, categories):
         query = """
-            INSERT INTO categoriy (category_id, category_name, category_description)
+            INSERT INTO categories (id, name, description)
             VALUES (%s, %s, %s)
         """
 
@@ -239,7 +227,7 @@ class SomeRepository:
 
     def get_by_id_c(self, category_id):
         query = """
-            SELECT category_id, category_name, category_description
+            SELECT id, name, description
             FROM category
             WHERE category_id = %s
         """
@@ -268,8 +256,18 @@ class SomeRepository:
             return None
 
         return Category(row[0], row[1], row[2])
+
+
+category_repo = CategoryRepository(get_connection())
+cat1 = Category(1, "Женская одежда")
+category_repo.add_categories(cat1)
+
     
 #-Product-------------------------------------------------------------------------------------------------------------------
+class ProductRepository:
+    def __init__(self, connection):
+        self.connection = connection
+    
     def add_product(self, product):
         query = """
             INSERT INTO product (product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active)

@@ -58,7 +58,7 @@ LeftSizes = (self, store_id, product_id, size, quantity):
 Byer =      (self, byer_id, byer_name, byer_email, byer_telephone):
 '''
 
-class SomeRepository:
+class CategoryRepository:
     def __init__(self, connection):
         self.connection = connection
 
@@ -91,9 +91,10 @@ class SomeRepository:
     
 
 #-Product-------------------------------------------------------------------------------------------------------------------
+   
     def add_product(self, product):
         query = """
-            INSERT INTO product (product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active)
+            INSERT INTO products (id, category_id, name, price, color, description, is_active)
             VALUES (%s, %s, %s)
         """
 
@@ -102,15 +103,15 @@ class SomeRepository:
 
         self.connection.commit()
 
-    def get_by_id_p(self, category_id):
+    def get_by_id(self, product_id):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
-            FROM category_id
+            FROM products
             WHERE id = %s
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (id,))
+            cursor.execute(query, (product_id,))
             row = cursor.fetchone()
 
         if row is None:
@@ -147,6 +148,11 @@ class SomeRepository:
         return LeftSizes(row[0], row[1], row[2], row[3])
     
 #-Byer-------------------------------------------------------------------------------------------------------------------
+ class CustomerRepository:
+
+    def __init__(self, connection):
+        self.connection= connection 
+    
     def add_byer(self, byer):
         query = """
             INSERT INTO product (byer_id, byer_name, byer_email, byer_telephone)
@@ -157,6 +163,25 @@ class SomeRepository:
             cursor.execute(query, (byer.byer_id, byer.byer_name, byer.byer_email, byer.byer_telephone))
 
         self.connection.commit()
+
+
+    def get_all(self):
+        query = """
+            SELECT id, byer_name, byer_email, byer_telephone
+            FROM customers
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
+        customers = []
+
+        for row in rows:
+            customer = Byer(row[0], row[1], row[2], row[3])
+            customers.append(customer)
+            
+        return customers
 
     def get_by_id_b(self, byer_id):
         query = """
