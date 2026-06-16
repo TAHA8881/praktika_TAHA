@@ -472,7 +472,23 @@ print(byer)
 
 
 # TODO: добавить модель позиции корзины
+class Cart:
+    def __init__(self):
+        self._items = []
 
+    def add_cart_product(self, product):
+        self._items.append(product)
+
+    def total_price(self):
+        total = 0
+
+        for product in self._items:
+            total += product.price
+
+        return total
+
+    def clear(self):
+        self._items.clear()
 
 # Задание 3
 # Опишите корзину.
