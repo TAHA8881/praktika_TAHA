@@ -50,7 +50,6 @@ def get_connection():
 
 
 # TODO: подключить репозитории к готовому соединению
-
 '''
 Category =  (self, category_id, category_name, category_description):
 Product =   (self, id, product_name, category_id, price, color, description, is_active):
@@ -75,9 +74,9 @@ class CategoryRepository:
 
     def get_by_id_c(self, category_id):
         query = """
-            SELECT category_id, category_name, category_description
-            FROM books
-            WHERE id = %s
+            SELECT id, name, description
+            FROM category
+            WHERE category_id = %s
         """
 
         with self.connection.cursor() as cursor:
@@ -89,6 +88,21 @@ class CategoryRepository:
 
         return Category(row[0], row[1], row[2])
     
+    def get_by_c_name(self, category_name):
+        query = """
+            SELECT category_id, category_name, category_description
+            FROM category
+            WHERE category_name = %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (category_name,))
+            row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return Category(row[0], row[1], row[2])    
 
 #-Product-------------------------------------------------------------------------------------------------------------------
 class ProductRepository:
@@ -106,7 +120,7 @@ class ProductRepository:
 
         self.connection.commit()
 
-    def get_by_id(self, product_id):
+    def get_by_id_p(self, product_id):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
             FROM products
@@ -121,7 +135,7 @@ class ProductRepository:
             return None
 
         return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
-    
+
 #-LeftSizes--------------------------------------------------------------------------------------------------------------------------------------
 class SizesRepository:
     def __init__(self, connection):

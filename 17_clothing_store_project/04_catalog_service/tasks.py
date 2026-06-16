@@ -17,6 +17,35 @@
 # Опишите модель категории одежды.
 # Категория должна хранить идентификатор, название и краткое описание.
 
+
+import os
+import psycopg2
+
+from importlib import import_module
+from pathlib import Path
+import sys
+
+PROJECT_ROOT = Path (__file__).resolve().parents[2]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.append(str(PROJECT_ROOT))
+
+domain_models = import_module("17_clothing_store_project.01_domain_models.tasks")
+Product = domain_models.Product
+Category = domain_models.Category
+LeftSizes = domain_models.LeftSizes
+Byer = domain_models.Byer    
+
+def get_connection():
+    return psycopg2.connect(
+        host=os.getenv("DB_HOST", "localhost"),
+        port=os.getenv("DB_PORT", "5432"),
+        dbname=os.getenv("DB_NAME", "clothing_store"),
+        user=os.getenv("DB_USER", "postgres"),
+        password=os.getenv("DB_PASSWORD", "postgres"),
+    )
+
+
 class Category:
     def __init__(self, category_id, category_name, category_description):
         if category_id == "":
@@ -96,9 +125,6 @@ class LeftSizes:
     def __repr__(self):
         return(f'{self.store_id}, {self.product_id}, {self.size}, {self.quantity}')
        
-
-
-
 # Добавьте поведение товара.
 # Товар или отдельная модель остатка должны помогать понять,
 # доступен ли конкретный размер и какое количество можно купить.
@@ -106,12 +132,8 @@ class LeftSizes:
 
 # добавить методы изменения и проверки товара
 
-
-
-
 # Опишите модель покупателя.
 # Продумайте поля для идентификатора, имени, телефона и email.
-
 
 # добавить модель покупателя
 class Byer:
@@ -143,63 +165,8 @@ class Byer:
 # Не копируйте классы моделей в файл репозиториев.
 # Модели не должны знать, что данные хранятся в PostgreSQL.
 
-import os
-import psycopg2
-
-from importlib import import_module
-from pathlib import Path
-import sys
-
-PROJECT_ROOT = Path (__file__).resolve().parents[2]
-
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.append(str(PROJECT_ROOT))
-
-domain_models = import_module("17_clothing_store_project.01_domain_models.tasks")
-Product = domain_models.Product
-Category = domain_models.Category
-LeftSizes = domain_models.LeftSizes
-Byer = domain_models.Byer
-
-def get_connection():
-    return psycopg2.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        port=os.getenv("DB_PORT", "5432"),
-        dbname=os.getenv("DB_NAME", "clothing_store"),
-        user=os.getenv("DB_USER", "postgres"),
-        password=os.getenv("DB_PASSWORD", "postgres"),
-    )
-
-
-
 # Подключитесь к PostgreSQL через функцию из 02_postgresql_storage/tasks.py.
 # Репозитории должны получать готовое соединение через __init__.
-
-
-
-
-#import os
-#import psycopg2
-
-#from importlib import import_module
-#from pathlib import Path
-#import sys
-
-domain_models = import_module("17_clothing_store_project.01_domain_models.tasks")
-Product = domain_models.Product
-Category = domain_models.Category
-LeftSizes = domain_models.LeftSizes
-Byer = domain_models.Byer
-
-def get_connection():
-    return psycopg2.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        port=os.getenv("DB_PORT", "5432"),
-        dbname=os.getenv("DB_NAME", "clothing_store"),
-        user=os.getenv("DB_USER", "postgres"),
-        password=os.getenv("DB_PASSWORD", "postgres"),
-    )
-
 
 # Задание 2
 # Подключитесь к PostgreSQL через функцию из 02_postgresql_storage/tasks.py.
@@ -207,6 +174,12 @@ def get_connection():
 
 
 # TODO: подключить репозитории к готовому соединению
+'''
+Category =  (self, category_id, category_name, category_description):
+Product =   (self, id, product_name, category_id, price, color, description, is_active):
+LeftSizes = (self, store_id, product_id, size, quantity):
+Byer =      (self, byer_id, byer_name, byer_email, byer_telephone):
+'''
 
 class CategoryRepository:
     def __init__(self, connection):
@@ -239,7 +212,7 @@ class CategoryRepository:
 
         return Category(row[0], row[1], row[2])
     
-    def get_by_id_c_id(self, category_name):
+    def get_by_c_name(self, category_name):
         query = """
             SELECT category_id, category_name, category_description
             FROM category
@@ -254,13 +227,7 @@ class CategoryRepository:
             return None
 
         return Category(row[0], row[1], row[2])
-
-
-category_repo = CategoryRepository(get_connection())
-cat1 = Category(1, "Женская одежда")
-category_repo.add_categories(cat1)
-
-    
+   
 #-Product-------------------------------------------------------------------------------------------------------------------
 class ProductRepository:
     def __init__(self, connection):
@@ -268,7 +235,7 @@ class ProductRepository:
     
     def add_product(self, product):
         query = """
-            INSERT INTO product (product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active)
+            INSERT INTO product (id, category_id, name, price, color, description, is_active)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
@@ -277,15 +244,15 @@ class ProductRepository:
 
         self.connection.commit()
 
-    def get_by_id_p(self, id):
+    def get_by_id_p(self, product_id):
         query = """
-            SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
+            SELECT product.id, product.category_id, product.product_name, product.price, product.color, product.description, product.is_active
             FROM product
             WHERE id = %s
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (id,))
+            cursor.execute(query, (product_id,))
             row = cursor.fetchone()
 
         if row is None:
@@ -293,7 +260,7 @@ class ProductRepository:
 
         return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
     
-    def get__by_active_status(self, is_active):
+    def get_by_active_status(self, is_active):
 
         if not isinstance(is_active, bool):
             raise ValueError("is_active должен быть булевым значением")
@@ -374,6 +341,10 @@ class ProductRepository:
 
         return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
 #-LeftSizes--------------------------------------------------------------------------------------------------------------------------------------
+class SizesRepository:
+    def __init__(self, connection):
+        self.connection = connection
+
     def add_left_sizes(self, left_sizes):
         query = """
             INSERT INTO product (store_id, product_id, size, quantity)
@@ -418,6 +389,11 @@ class ProductRepository:
         return LeftSizes(row[0], row[1], row[2], row[3])
     
 #-Byer-------------------------------------------------------------------------------------------------------------------
+class ByerRepository:
+
+    def __init__(self, connection):
+        self.connection= connection 
+    
     def add_byer(self, byer):
         query = """
             INSERT INTO product (byer_id, byer_name, byer_email, byer_telephone)
@@ -428,6 +404,24 @@ class ProductRepository:
             cursor.execute(query, (byer.byer_id, byer.byer_name, byer.byer_email, byer.byer_telephone))
 
         self.connection.commit()
+
+    def get_all(self):
+        query = """
+            SELECT id, byer_name, byer_email, byer_telephone
+            FROM customers
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
+        customers = []
+
+        for row in rows:
+            customer = Byer(row[0], row[1], row[2], row[3])
+            customers.append(customer)
+
+        return customers
 
     def get_by_id_b(self, byer_id):
         query = """

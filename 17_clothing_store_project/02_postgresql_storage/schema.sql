@@ -31,7 +31,7 @@ CREATE TABLE leftsizes (
 );
 
 -- TODO: таблица покупателей
-CREATE TABLE byer (
+CREATE TABLE customers (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     email TEXT NOT NULL CHEK(email != '@'),
