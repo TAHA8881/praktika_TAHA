@@ -89,6 +89,12 @@ class OpisanieZakaza:
 
 
 # TODO: добавить сервис оформления заказа
+class ClothingService:
+    def create_clothing(self, size, product):
+        if not product.Product():
+            raise ValueError("Покупка не возможна")
+        if not size.Product():
+            raise ValueError("Нет такого размера")
 
 
 # Задание 7
