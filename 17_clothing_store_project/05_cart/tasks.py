@@ -492,7 +492,7 @@ class Cart:
     def __init__(self):
         self._items = []
 
-    def add_cart_product(self, product):
+    def add_cart_products(self, product):
         self._items.append(product)
 
     def total_price(self):
@@ -514,24 +514,42 @@ class Cart:
 
 # TODO: добавить добавление позиции
 class AddProductInCart:
-    def add_in_cart_size(self):
+    def __init__(self):
+        self._products = []
+
+    def add_cart_product(self, product):
+        self._products.append(product)
+
+    def add_in_cart_size(self, size):
         LeftSizes.size = self.size
+        self.size = size
+        self._sizes.append(self.size)
 
-    def add_in_cart_quantity(self):
-        LeftSizes.quantity = self.quantity
+    def add_in_cart_quantity(self, quantity):
+        self.quantity = quantity
 
-    def add_in_cart_quantity(self):
-        LeftSizes.quantity = self.quantity
+        for product in self._products:
+            total += product.quantity
 
+        return quantity
+
+    def add_in_cart_quantity2(self, quantity2):
+        LeftSizes.quantity = self.quantity2
+        self.quantity2 = quantity2
+        self._sizes.append(self.size)
+
+    
+    
 # Задание 5
 # Добавьте изменение количества и удаление позиции.
 # Продумайте поведение при нулевом количестве.
 
+    def clear(self):
+        self._items.clear()
 
 # TODO: добавить изменение и удаление позиции
 
-
-# Задание 6
+# Задание 6 ✔
 # Добавьте расчет итоговой суммы и очистку корзины.
 
 
