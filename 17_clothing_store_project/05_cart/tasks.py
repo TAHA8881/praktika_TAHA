@@ -572,8 +572,4 @@ class AddProductInCart:
 
 
 # TODO: добавить ручную проверку корзины
-def proverka_korzinbl(self):
-    print (self._products)
-    print (self._products)
 
-proverka_korzinbl()
