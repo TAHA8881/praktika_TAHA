@@ -46,6 +46,31 @@ class ModelZakaza:
 
 
 # TODO: добавить модель заказа
+class OpisanieZakaza:
+    STATUSES = ["создан", "оплачен", 'передан в доставку', 'выполнен', 'выполнен', 'отменен']
+
+    def __init__id__(self, id, byer, product, total_price, status):
+        
+        self.product = product
+        self.id = id
+        self.byer = byer
+        self.product = product
+        self.total_price = total_price
+        self.status = status
+        
+        if id < 0:
+            raise ValueError("Идентификатор товара должен быть положительным")
+        
+        if status not in self.STATUSES:
+            raise ValueError("Таких статусов нет.  Напишите 1 из следующих статусов: создан, оплачен, передан в доставку, выполнен, отменен")
+        
+    def cancel(self):
+        if self.status == "выполнен":
+            raise ValueError("Нельзя отменить завершенную запись")
+
+        self.status = "отменен"
+
+
 
 
 # Задание 5

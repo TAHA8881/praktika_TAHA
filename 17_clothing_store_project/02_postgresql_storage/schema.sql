@@ -9,6 +9,7 @@ CREATE TABLE categories (
     name VARCHAR(200) NOT NULL,
     description TEXT NOT NULL 
 );
+-- TODO: таблица товаров
 
 CREATE TABLE products (
     id INTEGER PRIMARY KEY,
@@ -19,23 +20,23 @@ CREATE TABLE products (
     description TEXT NOT NULL,
     is_active boolean not null
 );
+
+-- TODO: таблица остатков товаров по размерам
+
 CREATE TABLE leftsizes (
     id INTEGER PRIMARY KEY,
     product_id INTEGER NOT NULL REFERENCES products(id),
     size TEXT NOT NULL,
     quantity INTEGER NOT NULL CHECK (quantity >= 0)
 );
+
+-- TODO: таблица покупателей
 CREATE TABLE byer (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     email TEXT NOT NULL CHEK(email != '@'),
 	phone TEXT NOT NULL
-)
--- TODO: таблица товаров
-
--- TODO: таблица остатков товаров по размерам
-
--- TODO: таблица покупателей
+);
 
 -- Следующие таблицы понадобятся на следующих этапах проекта.
 
