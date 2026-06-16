@@ -472,6 +472,22 @@ print(byer)
 
 
 # TODO: добавить модель позиции корзины
+class ProductSelection:
+    def __init__(self, product, size, ammount, price):
+        self.product = product
+        self.size = size
+        self.ammount = ammount
+        self.price = price
+
+
+
+# Задание 3
+# Опишите корзину.
+# Она должна хранить набор позиций одного покупателя.
+# На этом этапе корзина может жить в памяти текущего запуска программы.
+
+
+# TODO: добавить модель корзины
 class Cart:
     def __init__(self):
         self._items = []
@@ -490,22 +506,22 @@ class Cart:
     def clear(self):
         self._items.clear()
 
-# Задание 3
-# Опишите корзину.
-# Она должна хранить набор позиций одного покупателя.
-# На этом этапе корзина может жить в памяти текущего запуска программы.
-
-
-# TODO: добавить модель корзины
 
 
 # Задание 4
 # Добавьте добавление товара в корзину.
 # Учтите размер, количество и доступный остаток именно выбранного размера.
 
-
 # TODO: добавить добавление позиции
+class AddProductInCart:
+    def add_in_cart_size(self):
+        LeftSizes.size = self.size
 
+    def add_in_cart_quantity(self):
+        LeftSizes.quantity = self.quantity
+
+    def add_in_cart_quantity(self):
+        LeftSizes.quantity = self.quantity
 
 # Задание 5
 # Добавьте изменение количества и удаление позиции.
