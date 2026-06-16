@@ -91,11 +91,14 @@ class CategoryRepository:
     
 
 #-Product-------------------------------------------------------------------------------------------------------------------
-   
+class ProductRepository:
+    def __init__(self, connection):
+        self.connection = connection
+
     def add_product(self, product):
         query = """
             INSERT INTO products (id, category_id, name, price, color, description, is_active)
-            VALUES (%s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
         with self.connection.cursor() as cursor:
@@ -120,6 +123,10 @@ class CategoryRepository:
         return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
     
 #-LeftSizes--------------------------------------------------------------------------------------------------------------------------------------
+class SizesRepository:
+    def __init__(self, connection):
+        self.connection = connection
+
     def add_left_sizes(self, left_sizes):
         query = """
             INSERT INTO product (store_id, product_id, size, quantity)
@@ -148,7 +155,7 @@ class CategoryRepository:
         return LeftSizes(row[0], row[1], row[2], row[3])
     
 #-Byer-------------------------------------------------------------------------------------------------------------------
- class CustomerRepository:
+class ByerRepository:
 
     def __init__(self, connection):
         self.connection= connection 
@@ -180,7 +187,7 @@ class CategoryRepository:
         for row in rows:
             customer = Byer(row[0], row[1], row[2], row[3])
             customers.append(customer)
-            
+
         return customers
 
     def get_by_id_b(self, byer_id):

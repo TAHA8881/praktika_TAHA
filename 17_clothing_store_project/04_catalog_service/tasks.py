@@ -17,8 +17,6 @@
 # Опишите модель категории одежды.
 # Категория должна хранить идентификатор, название и краткое описание.
 
-
-
 class Category:
     def __init__(self, category_id, category_name, category_description):
         if category_id == "":
