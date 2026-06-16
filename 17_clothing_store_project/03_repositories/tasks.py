@@ -223,7 +223,7 @@ class SomeRepository:
 
 # TODO: добавить ручную проверку репозиториев с реальной БД
 category = Category(1,"Юбки","Женская одежда")
-product = Product(1, "Короткая юбка",1 , 1000, "серая", "Юбка выше колен", "Продан")
+product = Product(1, "Короткая юбка",1 , 1000, "серая", "Юбка выше колен", False)
 left_sizes = LeftSizes(1, 1, "XL", 5)
 byer = Byer (1, "Ivan", "Ivan@rambler.ru", "+79154908888")
 
