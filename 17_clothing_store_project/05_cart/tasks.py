@@ -563,6 +563,8 @@ class AddProductInCart:
 
 # TODO: отделить бизнес-проверки корзины от пользовательского ввода
 
+#"При необходимости..." я решила, что пока такой необходимости нет
+
 
 # Задание 8
 # Проверьте сценарий: добавить товар, увеличить количество, удалить позицию,
@@ -570,3 +572,8 @@ class AddProductInCart:
 
 
 # TODO: добавить ручную проверку корзины
+def proverka_korzinbl(self):
+    print (self._products)
+    print (self._products)
+
+proverka_korzinbl()
