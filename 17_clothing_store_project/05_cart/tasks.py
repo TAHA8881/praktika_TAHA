@@ -473,10 +473,10 @@ print(byer)
 
 # TODO: добавить модель позиции корзины
 class ProductSelection:
-    def __init__(self, product, size, ammount, price):
+    def __init__(self, product, size, quantity, price):
         self.product = product
         self.size = size
-        self.ammount = ammount
+        self.quantity = quantity
         self.price = price
 
 

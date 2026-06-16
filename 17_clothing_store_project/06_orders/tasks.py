@@ -32,7 +32,13 @@
 
 
 # TODO: добавить модель позиции заказа
-
+class ModelZakaza:
+    def __init__id__(self, product, product_name, size, price, quantity):
+        self.product = product
+        self.product_name = product_name
+        self.size = size
+        self.price = price
+        self.quantity = quantity
 
 # Задание 4
 # Опишите заказ.
