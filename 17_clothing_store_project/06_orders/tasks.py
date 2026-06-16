@@ -93,7 +93,7 @@ class ClothingService:
     def create_clothing(self, size, product):
         if not product.Product():
             raise ValueError("Покупка не возможна")
-        if not size.Product():
+        if not size.LeftSizes():
             raise ValueError("Нет такого размера")
 
 
