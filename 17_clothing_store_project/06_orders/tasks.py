@@ -7,6 +7,7 @@
 Модели заказа, репозиторий заказов и сервис заказов создавайте прямо в этом файле.
 Корзину, товары, покупателей и репозитории импортируйте из предыдущих этапов.
 """
+#from C:\visual_studio\praktika_TAHA\17_clothing_store_project\04_catalog_service\tasks.py import *
 
 
 # Задание 1
@@ -104,9 +105,9 @@ class ClothingService:
 
     
 # TODO: добавить безопасное списание остатков
-    def spisanie(self, a, OpisanieZakaza.total_price, ProductSelection.price):
+    def spisanie(self, a, OpisanieZakaza.total_price, CartProduct.price):
         if self.status == "выполнен":
-            a = OpisanieZakaza.total_price - ProductSelection.price
+            a = OpisanieZakaza.total_price - CartProduct.price
             return a
 
 # Задание 8
@@ -117,7 +118,8 @@ class ClothingService:
 # TODO: добавить транзакционное оформление заказа
 class Tranzactia:
     def vizov_func():
-        ProductSelection()
+        CartProduct()
+        Cart()
         PoziciaZakaza()
         ClothingService()
 
