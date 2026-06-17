@@ -90,10 +90,20 @@ class OrderRepository:
         
         with self.connection.cursor() as cursor:
             cursor.execute(query, (order.id, order.customer_id, order.total_price, order.status))
-
+            for item in order.items:
+                query_items =  """INSERT INTO order_items (id, order_id, clothes_name, size, price, quantity) VALUES (%s, %s, %s, %s, %s, %s)"""
+            cursor.execute(query_items, (
+                item.id,
+                order.id
+                item.clothes_id,                
+                item.clothes_name,
+                item.size,
+                item.price,
+                item.quantity
+            ))
         self.connection.commit()
 
-        query_items = """INSERT INTO order_items (id,order_id,clothes_id,clothes_name, size, price, quantity)"""
+        query_items = """INSERT INTO order_items (id,order_id,clothes_id, clothes_name, size, price, quantity)"""
 
 
 
@@ -120,7 +130,7 @@ class ClothingService:
 # Добавьте списание остатков со склада после успешного оформления.
 # Списание должно уменьшать остаток именно выбранного размера.
 # Ошибка в середине оформления не должна оставлять данные в странном состоянии.
-
+'''
     
 # TODO: добавить безопасное списание остатков
     def spisanie(self, a, OpisanieZakaza.total_price, CartProduct.price):
@@ -148,3 +158,4 @@ class Tranzactia:
 
 
 # TODO: добавить ручную проверку заказов
+'''
