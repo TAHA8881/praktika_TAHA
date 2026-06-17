@@ -33,9 +33,11 @@
 
 
 # TODO: добавить модель позиции заказа
-class PoziciaZakaza:
-    def __init__id__(self, product, product_name, size, price, quantity):
-        self.product = product
+class OrderItems:
+    def __init__id__(self, id, order_id, product_id, product_name, size, price, quantity):
+        self.id = id
+        self.order_id = order_id
+        self.product_id = product_id
         self.product_name = product_name
         self.size = size
         self.price = price
@@ -47,18 +49,17 @@ class PoziciaZakaza:
 
 
 # TODO: добавить модель заказа
-class OpisanieZakaza:
-    STATUSES = ["создан", "оплачен", 'передан в доставку', 'выполнен', 'выполнен', 'отменен']
+class Order:
+    STATUSES = ["создан", "оплачен", 'передан в доставку', 'выполнен', 'отменен']
 
-    def __init__id__(self, id, byer, product, total_price, status):
+    def __init__(self, id, customer_id, total_price, status):
 
-        self.product = product
         self.id = id
-        self.byer = byer
-        self.product = product
+        self.customer_id = customer_id
         self.total_price = total_price
         self.status = status
         
+
         if id < 0:
             raise ValueError("Идентификатор товара должен быть положительным")
         
@@ -72,8 +73,6 @@ class OpisanieZakaza:
         self.status = "отменен"
 
 
-
-
 # Задание 5 есть
 # Создайте репозиторий заказов.
 # Он должен сохранять заказ и позиции заказа в PostgreSQL,
@@ -81,6 +80,25 @@ class OpisanieZakaza:
 
 
 # TODO: добавить репозиторий заказов
+
+class OrderRepository:
+    def __init__(self,connection):
+        self.connection = connection
+
+    def add_order(self, order):
+        query = """INSERT INTO order (id, user_id, total_price,status) VALUES (%s, %s, %s, %s)"""
+        
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (order.id, order.customer_id, order.total_price, order.status))
+
+        self.connection.commit()
+
+        query_items = """INSERT INTO order_items (id,order_id,clothes_id,clothes_name, size, price, quantity)"""
+
+
+
+        
+
 
 
 # Задание 6
