@@ -63,7 +63,7 @@ class CategoryRepository:
 
     def add_categories(self, categories):
         query = """
-            INSERT INTO categories (category_id, category_name, category_description)
+            INSERT INTO categories (id, name, description)
             VALUES (%s, %s, %s)
         """
 
@@ -75,7 +75,7 @@ class CategoryRepository:
     def get_by_id_c(self, category_id):
         query = """
             SELECT id, name, description
-            FROM category
+            FROM categories
             WHERE category_id = %s
         """
 
@@ -91,7 +91,7 @@ class CategoryRepository:
     def get_by_c_name(self, category_name):
         query = """
             SELECT category_id, category_name, category_description
-            FROM category
+            FROM categories
             WHERE category_name = %s
         """
 
@@ -143,8 +143,8 @@ class SizesRepository:
 
     def add_left_sizes(self, left_sizes):
         query = """
-            INSERT INTO product (store_id, product_id, size, quantity)
-            VALUES (%s, %s, %s)
+            INSERT INTO left_sizes (id, product_id, size, quantity)
+            VALUES (%s, %s, %s, %s)
         """
 
         with self.connection.cursor() as cursor:
@@ -152,15 +152,15 @@ class SizesRepository:
 
         self.connection.commit()
 
-    def get_by_id_ls(self, category_id):
+    def get_by_id_ls(self, store_id):
         query = """
             SELECT store_id, product_id, size, quantity
-            FROM store_id
-            WHERE id = %s
+            FROM left_sizes
+            WHERE store_id = %s
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (category_id,))
+            cursor.execute(query, (store_id,))
             row = cursor.fetchone()
 
         if row is None:
@@ -176,8 +176,8 @@ class ByerRepository:
     
     def add_byer(self, byer):
         query = """
-            INSERT INTO product (byer_id, byer_name, byer_email, byer_telephone)
-            VALUES (%s, %s, %s)
+            INSERT INTO byer (id, name, email, phone)
+            VALUES (%s, %s, %s, %s)
         """
 
         with self.connection.cursor() as cursor:
@@ -189,7 +189,7 @@ class ByerRepository:
     def get_all(self):
         query = """
             SELECT id, byer_name, byer_email, byer_telephone
-            FROM customers
+            FROM byer
         """
 
         with self.connection.cursor() as cursor:
@@ -207,8 +207,8 @@ class ByerRepository:
     def get_by_id_b(self, byer_id):
         query = """
             SELECT byer_id, byer_name, byer_email, byer_telephone
-            FROM byer_id
-            WHERE id = %s
+            FROM byer
+            WHERE byer_id = %s
         """
 
         with self.connection.cursor() as cursor:

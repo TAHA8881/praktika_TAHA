@@ -199,7 +199,7 @@ class CategoryRepository:
     def get_by_id_c(self, category_id):
         query = """
             SELECT id, name, description
-            FROM category
+            FROM categories
             WHERE category_id = %s
         """
 
@@ -215,7 +215,7 @@ class CategoryRepository:
     def get_by_c_name(self, category_name):
         query = """
             SELECT category_id, category_name, category_description
-            FROM category
+            FROM categories
             WHERE category_name = %s
         """
 
@@ -235,7 +235,7 @@ class ProductRepository:
     
     def add_product(self, product):
         query = """
-            INSERT INTO product (id, category_id, name, price, color, description, is_active)
+            INSERT INTO products (id, category_id, name, price, color, description, is_active)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
@@ -247,7 +247,7 @@ class ProductRepository:
     def get_by_id_p(self, product_id):
         query = """
             SELECT product.id, product.category_id, product.product_name, product.price, product.color, product.description, product.is_active
-            FROM product
+            FROM products
             WHERE id = %s
         """
 
@@ -267,7 +267,7 @@ class ProductRepository:
     
         query = """
             SELECT id, product_name, category_id, price, color, description, is_active
-            FROM product
+            FROM products
             WHERE is_active = %s
         """
     
@@ -280,7 +280,7 @@ class ProductRepository:
     def get_by_p_n(self, product_name):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
-            FROM product
+            FROM products
             WHERE product_name = %s
         """
 
@@ -296,7 +296,7 @@ class ProductRepository:
     def get_by_id_p_a(self, is_active):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
-            FROM product
+            FROM products
             WHERE is_active = %s
         """
 
@@ -312,7 +312,7 @@ class ProductRepository:
     def get_by_c(self, color):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
-            FROM product
+            FROM products
             WHERE color = %s
         """
 
@@ -328,7 +328,7 @@ class ProductRepository:
     def get_by_p(self, min_price, max_price):
         query = """
             SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
-            FROM product
+            FROM products
             WHERE price BETWEEN %s AND %s
         """
 
@@ -347,8 +347,8 @@ class SizesRepository:
 
     def add_left_sizes(self, left_sizes):
         query = """
-            INSERT INTO product (store_id, product_id, size, quantity)
-            VALUES (%s, %s, %s)
+            INSERT INTO left_sizes (id, product_id, size, quantity)
+            VALUES (%s, %s, %s, %s)
         """
 
         with self.connection.cursor() as cursor:
@@ -396,8 +396,8 @@ class ByerRepository:
     
     def add_byer(self, byer):
         query = """
-            INSERT INTO product (byer_id, byer_name, byer_email, byer_telephone)
-            VALUES (%s, %s, %s)
+            INSERT INTO byer (id, name, email, phone)
+            VALUES (%s, %s, %s, %s)
         """
 
         with self.connection.cursor() as cursor:
@@ -408,7 +408,7 @@ class ByerRepository:
     def get_all(self):
         query = """
             SELECT id, byer_name, byer_email, byer_telephone
-            FROM customers
+            FROM byer
         """
 
         with self.connection.cursor() as cursor:
