@@ -6,6 +6,19 @@
 
 Модели и сервис корзины создавайте прямо в этом файле.
 Товар, остатки и сервис каталога импортируйте из предыдущих этапов.
+
+
+       if byer_id <= 0:
+            raise ValueError("Идентификатор покупателя  должен быть положительным")
+
+        if byer_name == "":
+            raise ValueError("Имя покупателя не может быть пустым")
+
+        if "@" not in byer_email:
+            raise ValueError("Некорректный email")
+
+              if size not in self.SIZES:
+            raise ValueError("Таких размеров одежды нет")      
 """
 
 
@@ -26,9 +39,9 @@
 
 
 # TODO: добавить модель позиции корзины
-class ProductSelection:
-    def __init__(self, product, size, quantity, price):
-        self.product = product
+class CartProduct:
+    def __init__(self, product_id, size, quantity, price):
+        self.product_id = product_id
         self.size = size
         self.quantity = quantity
         self.price = price
@@ -43,10 +56,20 @@ class ProductSelection:
 
 # TODO: добавить модель корзины
 class Cart:
-    def __init__(self):
+    def __init__(self, size, quantity):
         self._items = []
 
+        if size == "":
+            raise ValueError("размер не может быть пустым")
+        if quantity == "":
+            raise ValueError("размер не может быть пустым")
+        if quantity == "":
+            raise ValueError("размер не может быть пустым")
+        if size not in self.SIZES:
+            raise ValueError("Таких размеров одежды нет")      
+
     def add_cart_products(self, product):
+
         self._items.append(product)
 
     def total_price(self):
@@ -57,50 +80,26 @@ class Cart:
 
         return total
 
+    def delete_product(self, product):
+        self._items.remove(product)
+
     def clear(self):
         self._items.clear()
 
 
 
-# Задание 4
+# Задание 4 ✔
 # Добавьте добавление товара в корзину.
 # Учтите размер, количество и доступный остаток именно выбранного размера.
 
 # TODO: добавить добавление позиции
-class AddProductInCart:
-    def __init__(self):
-        self._products = []
 
-    def add_cart_product(self, product):
-        self._products.append(product)
-
-    def add_in_cart_size(self, size):
-        LeftSizes.size = self.size
-        self.size = size
-        self._sizes.append(self.size)
-
-    def add_in_cart_quantity(self, quantity):
-        self.quantity = quantity
-
-        for product in self._products:
-            total += product.quantity
-
-        return quantity
-
-    def add_in_cart_quantity2(self, quantity2):
-        LeftSizes.quantity = self.quantity2
-        self.quantity2 = quantity2
-        self._sizes.append(self.size)
-
-    
     
 # Задание 5
 # Добавьте изменение количества и удаление позиции.
 # Продумайте поведение при нулевом количестве.
 
-    def clear(self):
-        self._items.clear()
-
+    
 # TODO: добавить изменение и удаление позиции
 
 # Задание 6 ✔
