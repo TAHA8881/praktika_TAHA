@@ -94,7 +94,7 @@ class OrderRepository:
                 query_items =  """INSERT INTO order_items (id, order_id, clothes_name, size, price, quantity) VALUES (%s, %s, %s, %s, %s, %s)"""
             cursor.execute(query_items, (
                 item.id,
-                order.id
+                order.id,
                 item.clothes_id,                
                 item.clothes_name,
                 item.size,
@@ -103,7 +103,15 @@ class OrderRepository:
             ))
         self.connection.commit()
 
-        query_items = """INSERT INTO order_items (id,order_id,clothes_id, clothes_name, size, price, quantity)"""
+    def get_order_history(self, user_id):
+        query="""SELECT id, user_id, total_price, status, created at
+            FROM orders
+            WHERE user_id s%
+            ORDERBY created_at DESC"""
+        with self.connection.cursor() as cursor
+
+        
+#        query_items = """INSERT INTO order_items (id,order_id,clothes_id, clothes_name, size, price, quantity)"""
 
 
 
