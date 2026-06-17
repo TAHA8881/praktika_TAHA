@@ -102,9 +102,12 @@ class ClothingService:
 # Списание должно уменьшать остаток именно выбранного размера.
 # Ошибка в середине оформления не должна оставлять данные в странном состоянии.
 
-
+    
 # TODO: добавить безопасное списание остатков
-
+    def spisanie(self, a, OpisanieZakaza.total_price, ProductSelection.price):
+        if self.status == "выполнен":
+            a = OpisanieZakaza.total_price - ProductSelection.price
+            return a
 
 # Задание 8
 # Оберните оформление заказа в транзакцию.
@@ -112,7 +115,11 @@ class ClothingService:
 
 
 # TODO: добавить транзакционное оформление заказа
-
+class Tranzactia:
+    def vizov_func():
+        ProductSelection()
+        PoziciaZakaza()
+        ClothingService()
 
 # Задание 9
 # Проверьте успешное оформление и несколько ошибок: пустая корзина,
