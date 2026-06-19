@@ -7,11 +7,13 @@
 Модели заказа, репозиторий заказов и сервис заказов создавайте прямо в этом файле.
 Корзину, товары, покупателей и репозитории импортируйте из предыдущих этапов.
 """
-import __file__
+
+from importlib import import_module
 import sys
 import os
+from datetime import datetime
 #from C:\visual_studio\praktika_TAHA\17_clothing_store_project\04_catalog_service\tasks.py import *
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.adspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # Задание 1 :))))
