@@ -45,128 +45,14 @@ def get_connection():
         password=os.getenv("DB_PASSWORD", "postgres"),
     )
 
-
-class Category:
-    def __init__(self, category_id, category_name, category_description):
-        if category_id == "":
-            raise ValueError("Идентификатор товара не может быть пустым")
-        if category_name == "":
-            raise ValueError("Продукт не может быть пустым")
-        if  category_description == "":
-            raise ValueError("Описание товара не может быть пустым")
-
-        self.category_id = category_id
-        self.category_name = category_name
-        self.category_description = category_description
-
-    def __str__(self):
-        return(f'{self.category_id}, {self.category_name}, {self.category_description}')
-    def __repr__(self):
-        return(f'{self.category_id}, {self.category_name}, {self.category_description}')
-
-
-
-
-# Опишите модель товара.
-# Продумайте поля для идентификатора, названия, категории, цены, цвета,
-# описания и активности товара.
-
-
-class Product:
-    def __init__(self, id, product_name, category_id, price, color, description, is_active):
-        if id < 0:
-            raise ValueError("Идентификатор товара должен быть положительным")
-        if product_name == "":
-            raise ValueError("Название товара не может быть пустым")
-        if category_id < 0:
-            raise ValueError("Категория товара не может отрицательной")
-        if price <0:
-            raise ValueError("Не может быть, чтобы цена продуктов была меньше 0")
-        if  color == "":
-            raise ValueError("Цвет товара не может быть пустым")
-        if  description == "":
-            raise ValueError("Описание товара не может быть пустым")
-        if not isinstance(is_active, bool):
-            raise ValueError("Активность товара должна быть булевым значением (True/False)")
-        
-        self.id = id
-        self.product_name = product_name
-        self.category_id = category_id
-        self.price = price
-        self.color = color
-        self.description = description
-        self.is_active = is_active
-
-    def __str__(self):
-        return(f'{self.id}, {self.product_name}, {self.category_id}, {self.price}, {self.color}, {self.description}, {self.is_active}')
-    def __repr__(self):
-        return(f'{self.id}, {self.product_name}, {self.category_id}, {self.price}, {self.color}, {self.description}, {self.is_active}')
-
-
-class LeftSizes:
-    SIZES= ["XS", "S", 'L', 'M', 'XL', 'XXL']
-
-    def __init__(self, store_id, product_id, size, quantity):
-        
-
-        if size not in self.SIZES:
-            raise ValueError("Таких размеров одежды нет")
-        
-        self.store_id = store_id
-        self.product_id = product_id
-        self.size = size
-        self.quantity = quantity
-
-    def is_available(self):
-        return self.quantity > 0
-
-    def __str__(self):
-        return(f'{self.store_id}, {self.product_id}, {self.size}, {self.quantity}')
-    def __repr__(self):
-        return(f'{self.store_id}, {self.product_id}, {self.size}, {self.quantity}')
-       
-# Добавьте поведение товара.
-# Товар или отдельная модель остатка должны помогать понять,
-# доступен ли конкретный размер и какое количество можно купить.
-
-
-# добавить методы изменения и проверки товара
-
-# Опишите модель покупателя.
-# Продумайте поля для идентификатора, имени, телефона и email.
-
-# добавить модель покупателя
-class Byer:
-
-    def __init__(self, byer_id, byer_name, byer_email, byer_telephone):
-        if byer_id <= 0:
-            raise ValueError("Идентификатор покупателя  должен быть положительным")
-
-        if byer_name == "":
-            raise ValueError("Имя покупателя не может быть пустым")
-
-        if "@" not in byer_email:
-            raise ValueError("Некорректный email")
-
-        if  byer_telephone == "":
-            raise ValueError("Телефон покупателя не может быть пустым")
-
-        self.byer_id = byer_id
-        self.byer_name = byer_name
-        self.byer_email = byer_email
-        self.byer_telephone = byer_telephone
-
-    def __str__(self):
-        return(f'{self.byer_id}, {self.byer_name}, {self.byer_email}, {self.byer_telephone}')
-    def __repr__(self):
-        return(f'{self.byer_id}, {self.byer_name}, {self.byer_email}, {self.byer_telephone}')
-#----------------------------------------------------------------------------------------------
 # Импортируйте модели из файла 01_domain_models/tasks.py.
 # Не копируйте классы моделей в файл репозиториев.
 # Модели не должны знать, что данные хранятся в PostgreSQL.
 
 # Подключитесь к PostgreSQL через функцию из 02_postgresql_storage/tasks.py.
 # Репозитории должны получать готовое соединение через __init__.
+
+
 
 # Задание 2
 # Подключитесь к PostgreSQL через функцию из 02_postgresql_storage/tasks.py.
