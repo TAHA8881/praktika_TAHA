@@ -91,7 +91,7 @@ class OrderRepository:
         with self.connection.cursor() as cursor:
             cursor.execute(query, (order.id, order.customer_id, order.total_price, order.status))
             for item in order.items:
-                query_items =  """INSERT INTO order_items (id, order_id, clothes_name, size, price, quantity) VALUES (%s, %s, %s, %s, %s, %s)"""
+                query_items =  """INSERT INTO order_items (id, order_id, clothes_id, clothes_name, size, price, quantity) VALUES (%s, %s, %s, %s, %s, %s)"""
             cursor.execute(query_items, (
                 item.id,
                 order.id,
@@ -104,15 +104,66 @@ class OrderRepository:
         self.connection.commit()
 
     def get_order_history(self, user_id):
-        query="""SELECT id, user_id, total_price, status, created at
-            FROM orders
-            WHERE user_id s%
-            ORDERBY created_at DESC"""
-        with self.connection.cursor() as cursor
+        query="""SELECT id, user_id, total_price, status, created_at
+                FROM orders
+                WHERE user_id s%
+                ORDERBY created_at DESC"""
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (user_id,))
+            orders = cursor.fetchall()
 
+            result = []
+            for order_row in orders:
+                order_dict = {
+                    'id' : order_row[0],
+                    'user_id' : order_row[1],
+                    'total_price' : order_row[2],
+                    'status' : order_row[3],
+                    'created_at' : order_row[4],
+                    'items' : self._get_order_items(order_row[0])
+                }
+                result.append(order_dict)
+            return result
         
-#        query_items = """INSERT INTO order_items (id,order_id,clothes_id, clothes_name, size, price, quantity)"""
+    def _get_order_items(self, order_id):
+        query="""SELECT id, clothes_id, clothes_name, size, price, quantity
+                FROM order_items
+                WHERE order_id = s%"""
+            
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (order_id,))
+            items = cursor.fetchall()
 
+            return  [
+                {
+                    'id' : item[0],
+                    'clothes_id' : item[1],
+                    'clothes_name' : item[2],
+                    'size' : item[3],
+                    'price' : item[4],
+                    'quantity' : item[5]
+                }
+                for item in items
+            ]
+        
+    def get_order_by_id(self, order_id):
+        query="""SELECT id, user_id, total_price, status, created_at
+                FROM orders
+                WHERE id s%"""
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (order_id,))
+            order = cursor.fetchall()
+
+        if order_id:
+                return {
+                    'id' : order[0],
+                    'user_id' : order[1],
+                    'total_price' : order[2],
+                    'status' : order[3],
+                    'created_at' : order[4],
+                    'items' : self._get_order_items(order[0])
+                }
+        return None
 
 
         
