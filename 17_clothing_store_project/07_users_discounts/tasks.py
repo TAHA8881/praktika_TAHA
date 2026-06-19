@@ -14,7 +14,34 @@
 
 
 # TODO: расширить данные покупателя
+class Delivery:
+    def __init__(self, byer_id, byer_name, byer_email, byer_telephone, address):
+        if byer_id <= 0:
+            raise ValueError("Идентификатор покупателя  должен быть положительным")
 
+        if byer_name == "":
+            raise ValueError("Имя покупателя не может быть пустым")
+
+        if "@" not in byer_email:
+            raise ValueError("Некорректный email")
+
+        if  byer_telephone == "":
+            raise ValueError("Телефон покупателя не может быть пустым")
+        
+        if address == "":
+            raise ValueError("Координаты покупателя не может быть пустыми")
+
+        self.byer_id = byer_id
+        self.byer_name = byer_name
+        self.byer_email = byer_email
+        self.byer_telephone = byer_telephone
+        self.address = address
+
+    def __str__(self):
+        return(f'{self.byer_id}, {self.byer_name}, {self.byer_email}, {self.byer_telephone}, {self.address}')
+   
+    def __repr__(self):
+        return(f'{self.byer_id}, {self.byer_name}, {self.byer_email}, {self.byer_telephone}, {self.address}')
 
 # Задание 2
 # Расширьте SQL-схему таблицами адресов доставки и промокодов.
@@ -24,7 +51,7 @@
 # TODO: добавить таблицы адресов и промокодов в schema.sql
 
 
-# Задание 3
+# Задание 3  ✔
 # Опишите адрес доставки отдельной моделью.
 # Продумайте обязательные поля и простые проверки.
 
@@ -38,7 +65,38 @@
 
 
 # TODO: добавить репозиторий адресов доставки
+class AddressRepository:
 
+    def __init__(self, connection):
+        self.connection= connection 
+
+    def add_address(self, address):
+        query = """
+            INSERT INTO delivery (byer_id, byer_name, byer_email, byer_telephone, address)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (address.byer_id, address.byer_name, address.byer_email, address.byer_telephone, address.address))
+
+        self.connection.commit()
+
+    def get_adress_by_byer_id(self, byer_id):
+        query = """
+            SELECT address
+            FROM delivery
+            WHERE byer_id = %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (byer_id,))
+            rows = cursor.fetchall()
+            addresses = []
+        for row in rows:
+            addresses.append(Delivery(byer_id, row [0], row [1], row [3] ))
+
+        return addresses
+ 
 
 # Задание 5
 # Опишите промокод.

@@ -9,11 +9,19 @@
 """
 
 from importlib import import_module
+from pathlib import Path
 import sys
-import os
-from datetime import datetime
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+PROJECT_ROOT = Path (__file__).resolve().parents[2]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.append(str(PROJECT_ROOT))
+
+domain_models = import_module("17_clothing_store_project.01_domain_models.tasks")
+Product = domain_models.Product
+Category = domain_models.Category
+LeftSizes = domain_models.LeftSizes
+Byer = domain_models.Byer
 
 # Задание 1 :))))
 # Импортируйте модели товара, остатка по размеру, покупателя, корзины и репозитории.
@@ -190,12 +198,14 @@ class ClothingService:
 # Добавьте списание остатков со склада после успешного оформления.
 # Списание должно уменьшать остаток именно выбранного размера.
 # Ошибка в середине оформления не должна оставлять данные в странном состоянии.
-'''
+
     
 # TODO: добавить безопасное списание остатков
-    def spisanie(self, a, OpisanieZakaza.total_price, CartProduct.price):
+class Tranzactia:
+#    def spisanie(self, a, OpisanieZakaza.total_price, CartProduct.price):
+    def spisanie(self, a):
         if self.status == "выполнен":
-            a = OpisanieZakaza.total_price - CartProduct.price
+            a = OpisanieZakaza.total_price - price.CartProduct
             return a
 
 # Задание 8
@@ -204,6 +214,9 @@ class ClothingService:
 
 
 # TODO: добавить транзакционное оформление заказа
+
+
+
 class Tranzactia:
     def vizov_func():
         CartProduct()
@@ -218,4 +231,3 @@ class Tranzactia:
 
 
 # TODO: добавить ручную проверку заказов
-'''
