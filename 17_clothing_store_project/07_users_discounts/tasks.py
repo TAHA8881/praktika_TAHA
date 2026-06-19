@@ -145,13 +145,13 @@ class PromoCodeRepository:
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (percent,))
-            rows = cursor.fetchall()
-            promcodes = []
-        for row in rows:
-            promcodes.append(Delivery(percent, row [0], row [1], row [3], row [4] ))
+            cursor.execute(query, (percent,)) 
+            row = cursor.fetchone()
 
-        return promcodes
+        if row is None:
+            return None
+
+        return PromoCodeRepository(row[0], row[1], row[2], row[3])
 
 # Задание 7
 # Создайте сервис скидок.
@@ -160,17 +160,17 @@ class PromoCodeRepository:
 
 # TODO: добавить сервис скидок
 class DiscountService:
-    def calculate_total(self, total, promo_code):
-        if promo_code is None:
+    def calculate_total(self, total, promcod):
+        if promcod is None:
             return total
 
-        if not promo_code.is_active:
+        if not promcod.is_active:
             raise ValueError("Промокод неактивен")
 
-        if total < promo_code.min_total:
+        if total < promcod.min_total:
             raise ValueError("Сумма меньше минимальной")
 
-        discount = total * promo_code.percent // 100
+        discount = total * promcod.percent // 100
         return total - discount
 
 # Задание 8
