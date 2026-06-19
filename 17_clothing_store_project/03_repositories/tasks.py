@@ -152,15 +152,15 @@ class SizesRepository:
 
         self.connection.commit()
 
-    def get_by_id_ls(self, store_id):
+    def get_by_id_ls(self, product_id):
         query = """
             SELECT store_id, product_id, size, quantity
             FROM left_sizes
-            WHERE store_id = %s
+            WHERE product_id = %s
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (store_id,))
+            cursor.execute(query, (product_id,))
             row = cursor.fetchone()
 
         if row is None:

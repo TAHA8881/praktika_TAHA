@@ -186,12 +186,9 @@ class OrderRepository:
 
 
 # TODO: добавить сервис оформления заказа
-class ClothingService:
-    def create_clothing(self, size, product):
-        if not product.Product():
-            raise ValueError("Покупка не возможна")
-        if not size.LeftSizes():
-            raise ValueError("Нет такого размера")
+class OrderService:
+    def create_order(self,cart):
+        
 
 
 # Задание 7
