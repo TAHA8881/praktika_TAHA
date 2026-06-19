@@ -15,7 +15,7 @@
 
 # TODO: расширить данные покупателя
 class Delivery:
-    def __init__(self, byer_id, byer_name, byer_email, byer_telephone, address):
+    def __init__(self, byer_id, byer_name, byer_email, byer_telephone, address, promcode):
         if byer_id <= 0:
             raise ValueError("Идентификатор покупателя  должен быть положительным")
 
@@ -30,18 +30,22 @@ class Delivery:
         
         if address == "":
             raise ValueError("Координаты покупателя не может быть пустыми")
+        
+        if promcode == "":
+            raise ValueError("Промокод покупателя не может быть пустым")
 
         self.byer_id = byer_id
         self.byer_name = byer_name
         self.byer_email = byer_email
         self.byer_telephone = byer_telephone
         self.address = address
+        self.promcode = promcode
 
     def __str__(self):
-        return(f'{self.byer_id}, {self.byer_name}, {self.byer_email}, {self.byer_telephone}, {self.address}')
+        return(f'{self.byer_id}, {self.byer_name}, {self.byer_email}, {self.byer_telephone}, {self.address}, {self.promcode}')
    
     def __repr__(self):
-        return(f'{self.byer_id}, {self.byer_name}, {self.byer_email}, {self.byer_telephone}, {self.address}')
+        return(f'{self.byer_id}, {self.byer_name}, {self.byer_email}, {self.byer_telephone}, {self.address}, {self.promcode}')
 
 # Задание 2
 # Расширьте SQL-схему таблицами адресов доставки и промокодов.
@@ -77,7 +81,7 @@ class AddressRepository:
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (address.byer_id, address.byer_name, address.byer_email, address.byer_telephone, address.address))
+            cursor.execute(query, (address.byer_id, address.byer_name, address.byer_email, address.byer_telephone, address.address, address.promcode))
 
         self.connection.commit()
 
@@ -104,7 +108,12 @@ class AddressRepository:
 
 
 # TODO: добавить модель промокода
-
+class PromoCode:
+    def __init__(self, code, percent, min_total, is_active=True):
+        self.code = code
+        self.percent = percent
+        self.min_total = min_total
+        self.is_active = is_active
 
 # Задание 6
 # Создайте репозиторий промокодов.
@@ -112,7 +121,37 @@ class AddressRepository:
 
 
 # TODO: добавить репозиторий промокодов
+class PromoCodeRepository:
 
+    def __init__(self, connection):
+        self.connection= connection 
+
+    def add_promo_code(self, promcod):
+        query = """
+            INSERT INTO delivery (code, percent, min_total, is_active)
+            VALUES (%s, %s, %s, %s)
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (promcod.code, promcod.percent, promcod.min_total, promcod.is_active))
+
+        self.connection.commit()
+
+    def get_promo_code_by_percent(self, percent):
+        query = """
+            SELECT promcod
+            FROM delivery
+            WHERE percent = %s
+        """
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (percent,))
+            rows = cursor.fetchall()
+            promcodes = []
+        for row in rows:
+            promcodes.append(Delivery(percent, row [0], row [1], row [3], row [4] ))
+
+        return promcodes
 
 # Задание 7
 # Создайте сервис скидок.
@@ -120,7 +159,19 @@ class AddressRepository:
 
 
 # TODO: добавить сервис скидок
+class DiscountService:
+    def calculate_total(self, total, promo_code):
+        if promo_code is None:
+            return total
 
+        if not promo_code.is_active:
+            raise ValueError("Промокод неактивен")
+
+        if total < promo_code.min_total:
+            raise ValueError("Сумма меньше минимальной")
+
+        discount = total * promo_code.percent // 100
+        return total - discount
 
 # Задание 8
 # Подключите скидку к оформлению заказа.
