@@ -14,7 +14,24 @@
 # Для проверки создайте несколько товаров с разными остатками по размерам.
 #---______-________-_________-_---------_____________-------------____________________________________________________________________________________________________________________________________________________________________________________________________________________
 
-# cm 4 задание
+
+from importlib import import_module
+from pathlib import Path
+import sys
+
+
+PROJECT_ROOT = Path (__file__).resolve().parents[2]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.append(str(PROJECT_ROOT))
+
+
+domain_models = import_module("17_clothing_store_project.01_domain_models.tasks")
+Product = domain_models.Product
+Category = domain_models.Category
+LeftSizes = domain_models.LeftSizes
+Byer = domain_models.Byer
+
 
 #---_______-____________________-_________________-___________-_____________________________------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # TODO: подготовить товары для корзины
@@ -99,6 +116,15 @@ class Cart:
 # Задание 7
 # При необходимости создайте сервис корзины.
 # Он может проверять доступность товара через сервис каталога или репозиторий остатков.
+class CartService:
+    def __init__(self, catalog, repozit):
+        self.catalog = catalog
+        self.repozit = repozit
+        self.cart = Cart()
+
+    def add_to_cart(self, product_id, size, quantity):
+        self.catalog.get_by_id_p
+    
 
 
 # TODO: отделить бизнес-проверки корзины от пользовательского ввода
