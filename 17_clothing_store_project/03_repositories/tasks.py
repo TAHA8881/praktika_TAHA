@@ -24,7 +24,6 @@ from pathlib import Path
 import sys
 
 PROJECT_ROOT = Path (__file__).resolve().parents[2]
-
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
@@ -76,7 +75,7 @@ class CategoryRepository:
         query = """
             SELECT id, name, description
             FROM categories
-            WHERE category_id = %s
+            WHERE id = %s
         """
 
         with self.connection.cursor() as cursor:
@@ -90,19 +89,41 @@ class CategoryRepository:
     
     def get_by_c_name(self, category_name):
         query = """
-            SELECT category_id, category_name, category_description
+            SELECT id, name, description
             FROM categories
-            WHERE category_name = %s
+            WHERE name = %s
         """
 
         with self.connection.cursor() as cursor:
             cursor.execute(query, (category_name,))
             row = cursor.fetchone()
-
-        if row is None:
+            if row:
+                return Category(row[0], row[1], row[2])    
             return None
+        
+    def get_all(self):
+        query = "SELECT id, name, description FROM categories ORDER BY id"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            return [Category(row[0], row[1], row[2]) for row in rows]
 
-        return Category(row[0], row[1], row[2])    
+    def update(self, category):
+        query = """
+            UPDATE categories SET name = %s, description = %s
+            WHERE id = %s
+        """
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (category.category_name, category.category_description, category.category_id))
+            self.connection.commit()
+
+    def delete(self, category_id):
+        query = "DELETE FROM categories WHERE id = %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (category_id,))
+            if cursor.rowcount == 0:
+                raise ValueError(f"Категория с id {category_id} не найдена")
+            self.connection.commit()
 
 #-Product-------------------------------------------------------------------------------------------------------------------
 class ProductRepository:
@@ -116,13 +137,13 @@ class ProductRepository:
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active))
+            cursor.execute(query, (product.id, product.category_id, product.product_name, product.price, product.color, product.description, product.is_active))
 
         self.connection.commit()
 
     def get_by_id_p(self, product_id):
         query = """
-            SELECT product.id, product.product_name, product.category_id, product.price, product.color, product.description, product.is_active
+            SELECT id, category_id, name, price, color, description, is_active
             FROM products
             WHERE id = %s
         """
@@ -131,11 +152,116 @@ class ProductRepository:
             cursor.execute(query, (product_id,))
             row = cursor.fetchone()
 
-        if row is None:
-            return None
+        if row:
 
-        return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
+            return Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6] )
+        return None
+    
+    def get_all(self, only_active=False):
+        query = "SELECT id, category_id, name, price, color, description, is_active FROM products"
+        params = []
+        if only_active:
+            query += " WHERE is_active = TRUE"
+        query += " ORDER BY id"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            return [Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6]) for row in rows]
 
+    def search_by_name(self, keyword, only_active=False):
+        query = """
+            SELECT id, category_id, name, price, color, description, is_active
+            FROM products
+            WHERE LOWER(name) LIKE LOWER(%s)
+        """
+        params = [f'%{keyword}%']
+        if only_active:
+            query += " AND is_active = TRUE"
+        query += " ORDER BY name"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            return [Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6]) for row in rows]
+
+    def filter_by_category(self, category_id, only_active=False):
+        query = """
+            SELECT id, category_id, name, price, color, description, is_active
+            FROM products
+            WHERE category_id = %s
+        """
+        params = [category_id]
+        if only_active:
+            query += " AND is_active = TRUE"
+        query += " ORDER BY name"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            return [Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6]) for row in rows]
+
+    def filter_by_color(self, color, only_active=False):
+        query = """
+            SELECT id, category_id, name, price, color, description, is_active
+            FROM products
+            WHERE LOWER(color) = LOWER(%s)
+        """
+        params = [color]
+        if only_active:
+            query += " AND is_active = TRUE"
+        query += " ORDER BY name"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            return [Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6]) for row in rows]
+
+    def filter_by_price_range(self, min_price, max_price, only_active=False):
+        query = """
+            SELECT id, category_id, name, price, color, description, is_active
+            FROM products
+            WHERE price BETWEEN %s AND %s
+        """
+        params = [min_price, max_price]
+        if only_active:
+            query += " AND is_active = TRUE"
+        query += " ORDER BY price"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            return [Product(row[0], row[1], row[2], row[3], row[4], row[5], row[6]) for row in rows]
+
+    def update(self, product):
+        query = """
+            UPDATE products SET
+                category_id = %s,
+                name = %s,
+                price = %s,
+                color = %s,
+                description = %s,
+                is_active = %s
+            WHERE id = %s
+        """
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (
+                product.category_id,
+                product.product_name,
+                product.price,
+                product.color,
+                product.description,
+                product.is_active,
+                product.id
+            ))
+            if cursor.rowcount == 0:
+                raise ValueError(f"Товар с id {product.id} не найден")
+            self.connection.commit()
+
+
+    def delete(self, product_id):
+        query = "DELETE FROM products WHERE id = %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (product_id,))
+            if cursor.rowcount == 0:
+                raise ValueError(f"Товар с id {product_id} не найден")
+            self.connection.commit()
+    
 #-LeftSizes--------------------------------------------------------------------------------------------------------------------------------------
 class SizesRepository:
     def __init__(self, connection):
@@ -143,7 +269,7 @@ class SizesRepository:
 
     def add_left_sizes(self, left_sizes):
         query = """
-            INSERT INTO left_sizes (id, product_id, size, quantity)
+            INSERT INTO leftsizes (id, product_id, size, quantity)
             VALUES (%s, %s, %s, %s)
         """
 
@@ -152,22 +278,62 @@ class SizesRepository:
 
         self.connection.commit()
 
-    def get_by_id_ls(self, product_id):
+    def get_by_id_ls(self, leftsize_id):
         query = """
             SELECT store_id, product_id, size, quantity
-            FROM left_sizes
+            FROM leftsizes
             WHERE product_id = %s
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (product_id,))
+            cursor.execute(query, (leftsize_id,))
             row = cursor.fetchone()
 
-        if row is None:
+        if row:
+            return LeftSizes(row[0], row[1], row[2], row[3])
+        return None
+
+    def get_by_product_and_size(self, product_id, size):
+        query = "SELECT id, product_id, size, quantity FROM leftsizes WHERE product_id = %s AND size = %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (product_id, size))
+            row = cursor.fetchone()
+            if row:
+                return LeftSizes(row[0], row[1], row[2], row[3])
             return None
 
-        return LeftSizes(row[0], row[1], row[2], row[3])
-    
+    def get_by_product(self, product_id):
+        query = "SELECT id, product_id, size, quantity FROM leftsizes WHERE product_id = %s ORDER BY size"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (product_id,))
+            rows = cursor.fetchall()
+            return [LeftSizes(row[0], row[1], row[2], row[3]) for row in rows]
+
+    def update_quantity(self, product_id, size, new_quantity):
+        query = "UPDATE leftsizes SET quantity = %s WHERE product_id = %s AND size = %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (new_quantity, product_id, size))
+            if cursor.rowcount == 0:
+                raise ValueError(f"Остаток для товара {product_id} размера {size} не найден")
+            self.connection.commit()
+
+    def decrease_quantity(self, product_id, size, amount):
+        query = "UPDATE leftsizes SET quantity = quantity - %s WHERE product_id = %s AND size = %s AND quantity >= %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (amount, product_id, size, amount))
+            if cursor.rowcount == 0:
+                raise ValueError(f"Недостаточно остатка или запись не найдена для товара {product_id} размера {size}")
+            self.connection.commit()
+
+    def delete(self, leftsize_id):
+        query = "DELETE FROM leftsizes WHERE id = %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (leftsize_id,))
+            if cursor.rowcount == 0:
+                raise ValueError(f"Запись остатка с id {leftsize_id} не найдена")
+            self.connection.commit()
+
+
 #-Byer-------------------------------------------------------------------------------------------------------------------
 class ByerRepository:
 
@@ -176,7 +342,7 @@ class ByerRepository:
     
     def add_byer(self, byer):
         query = """
-            INSERT INTO byer (id, name, email, phone)
+            INSERT INTO customers (id, name, email, phone)
             VALUES (%s, %s, %s, %s)
         """
 
@@ -188,38 +354,58 @@ class ByerRepository:
 
     def get_all(self):
         query = """
-            SELECT id, byer_name, byer_email, byer_telephone
-            FROM byer
+            SELECT id, name, email, phone
+            FROM customers
+            ORDER BY id
         """
 
         with self.connection.cursor() as cursor:
             cursor.execute(query)
             rows = cursor.fetchall()
+            return [Byer(row[0], row[1], row[2], row[3]) for row in rows]
 
-        customers = []
-
-        for row in rows:
-            customer = Byer(row[0], row[1], row[2], row[3])
-            customers.append(customer)
-
-        return customers
-
-    def get_by_id_b(self, byer_id):
+    def get_by_id_b(self, customer_id):
         query = """
-            SELECT byer_id, byer_name, byer_email, byer_telephone
-            FROM byer
-            WHERE byer_id = %s
+            SELECT id, name, email, phone
+            FROM customers
+            WHERE id = %s
         """
 
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (byer_id,))
+            cursor.execute(query, (customer_id,))
             row = cursor.fetchone()
-
-        if row is None:
+        if row:
+            return Byer(row[0], row[1], row[2], row[3])
+        return None
+    
+    def get_by_email(self, email):
+        query = "SELECT id, name, email, phone FROM customers WHERE email = %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (email,))
+            row = cursor.fetchone()
+            if row:
+                return Byer(row[0], row[1], row[2], row[3])
             return None
 
-        return Byer(row[0], row[1], row[2], row[3])
- 
+    def update(self, customer):
+        query = """
+            UPDATE customers SET name = %s, email = %s, phone = %s
+            WHERE id = %s
+        """
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (customer.byer_name, customer.byer_email, customer.byer_telephone, customer.byer_id))
+            if cursor.rowcount == 0:
+                raise ValueError(f"Покупатель с id {customer.byer_id} не найден")
+            self.connection.commit()
+
+    def delete(self, customer_id):
+        query = "DELETE FROM customers WHERE id = %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (customer_id,))
+            if cursor.rowcount == 0:
+                raise ValueError(f"Покупатель с id {customer_id} не найден")
+            self.connection.commit()
+
 
 # Задание 3
 # Создайте репозиторий категорий.
@@ -268,12 +454,38 @@ class ByerRepository:
 
 
 # TODO: добавить ручную проверку репозиториев с реальной БД
-category = Category(1,"Юбки","Женская одежда")
-product = Product(1, "Короткая юбка",1 , 1000, "серая", "Юбка выше колен", False)
-left_sizes = LeftSizes(1, 1, "XL", 5)
-byer = Byer (1, "Ivan", "Ivan@rambler.ru", "+79154908888")
+#category = Category(1,"Юбки","Женская одежда")
+#product = Product(1, "Короткая юбка",1 , 1000, "серая", "Юбка выше колен", False)
+#left_sizes = LeftSizes(1, 1, "XL", 5)
+#byer = Byer (1, "Ivan", "Ivan@rambler.ru", "+79154908888")
 
-print(category)
-print(product)
-print(left_sizes)
-print(byer)
+#print(category)
+#print(product)
+#print(left_sizes)
+#print(byer)
+
+if __name__ == "__main__":
+    conn = get_connection()
+
+    # Пример теста – создаём и читаем категорию, товар, остаток, покупателя
+    cat_repo = CategoryRepository(conn)
+    cat = Category(1, "Обувь", "Женская и мужская обувь")   # id=1 задаём явно
+    cat_repo.add_categories(cat)
+    print(cat_repo.get_by_id_c(1))
+
+    prod_repo = ProductRepository(conn)
+    prod = Product(1, "Кроссовки", 1, 2500, "белый", "Спортивная обувь", True)  # id=1
+    prod_repo.add_product(prod)
+    print(prod_repo.get_by_id_p(1))
+
+    left_repo = SizesRepository(conn)
+    left = LeftSizes(1, 1, "42", 10)  # store_id=1
+    left_repo.add_left_sizes(left)
+    print(left_repo.get_by_product_and_size(1, "42"))
+
+    cust_repo = ByerRepository(conn)
+    cust = Byer(1, "Иван Петров", "ivan@mail.ru", "+79123456789")
+    cust_repo.add_byer(cust)
+    print(cust_repo.get_by_id_b(1))
+
+    conn.close()
