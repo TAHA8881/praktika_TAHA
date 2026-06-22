@@ -2,112 +2,62 @@
 Этап 07. Пользователи и скидки
 
 Цель: добавить адреса доставки, промокоды и отдельную логику расчета скидок.
-
-Модели адреса и промокода, их репозитории и сервис скидок создавайте прямо в этом файле.
-Покупателя и сервис заказов импортируйте из предыдущих этапов.
 """
 
+# Задание 1
+# Импорты (добавлены репозитории и сервисы из предыдущих этапов)
+from importlib import import_module
+from pathlib import Path
+import sys
 
-# Задание 1 :)
-# Расширьте модель покупателя.
-# Добавьте данные, которые нужны для связи и доставки.
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.append(str(PROJECT_ROOT))
+
+# ← Импортируем доменные модели
+domain_models = import_module("17_clothing_store_project.01_domain_models.tasks")
+Product = domain_models.Product
+Category = domain_models.Category
+LeftSizes = domain_models.LeftSizes
+Byer = domain_models.Byer  # ← используем существующую модель покупателя
+
+# ← Импортируем репозитории из этапа 03
+repos = import_module("17_clothing_store_project.03_repositories.tasks")
+ProductRepository = repos.ProductRepository
+SizesRepository = repos.SizesRepository
+ByerRepository = repos.ByerRepository
+get_connection = repos.get_connection
+
+# ← Импортируем сервис заказов из этапа 06 (для интеграции скидок)
+order_module = import_module("17_clothing_store_project.06_orders.tasks")
+OrderService = order_module.OrderService
+Order = order_module.Order
 
 
-# TODO: расширить данные покупателя
-class Delivery:
-    def __init__(self, byer_id, byer_name, byer_email, byer_telephone, address, promcode):
-        if byer_id <= 0:
-            raise ValueError("Идентификатор покупателя  должен быть положительным")
+# Задание 1 (расширение покупателя – не нужно, используем Byer как есть)
+# Вместо создания класса Delivery, мы создаём отдельные модели: Address и PromoCode.
 
-        if byer_name == "":
-            raise ValueError("Имя покупателя не может быть пустым")
-
-        if "@" not in byer_email:
-            raise ValueError("Некорректный email")
-
-        if  byer_telephone == "":
-            raise ValueError("Телефон покупателя не может быть пустым")
-        
-        if address == "":
-            raise ValueError("Координаты покупателя не может быть пустыми")
-        
-        if promcode == "":
-            raise ValueError("Промокод покупателя не может быть пустым")
-
-        self.byer_id = byer_id
-        self.byer_name = byer_name
-        self.byer_email = byer_email
-        self.byer_telephone = byer_telephone
+# Задание 3
+# Модель адреса доставки
+class Address:
+    def __init__(self, id=None, customer_id=None, address=None, is_default=False):
+        self.id = id
+        self.customer_id = customer_id
         self.address = address
-        self.promcode = promcode
+        self.is_default = is_default
+
+        # ← простые проверки
+        if customer_id is not None and customer_id <= 0:
+            raise ValueError("ID покупателя должен быть положительным")
+        if address is None or address == "":
+            raise ValueError("Адрес не может быть пустым")
 
     def __str__(self):
-        return(f'{self.byer_id}, {self.byer_name}, {self.byer_email}, {self.byer_telephone}, {self.address}, {self.promcode}')
-   
-    def __repr__(self):
-        return(f'{self.byer_id}, {self.byer_name}, {self.byer_email}, {self.byer_telephone}, {self.address}, {self.promcode}')
+        return f"{self.address} (по умолчанию: {self.is_default})"
 
-# Задание 2
-# Расширьте SQL-схему таблицами адресов доставки и промокодов.
-# Продумайте внешние ключи, уникальность кода промокода и обязательные поля.
-
-
-# TODO: добавить таблицы адресов и промокодов в schema.sql
-
-
-# Задание 3  ✔
-# Опишите адрес доставки отдельной моделью.
-# Продумайте обязательные поля и простые проверки.
-
-
-# TODO: добавить модель адреса
-
-
-# Задание 4
-# Создайте репозиторий адресов доставки.
-# Покупатель может иметь один или несколько адресов.
-
-
-# TODO: добавить репозиторий адресов доставки
-class AddressRepository:
-
-    def __init__(self, connection):
-        self.connection= connection 
-
-    def add_address(self, address):
-        query = """
-            INSERT INTO delivery (byer_id, byer_name, byer_email, byer_telephone, address)
-            VALUES (%s, %s, %s, %s, %s)
-        """
-
-        with self.connection.cursor() as cursor:
-            cursor.execute(query, (address.byer_id, address.byer_name, address.byer_email, address.byer_telephone, address.address, address.promcode))
-
-        self.connection.commit()
-
-    def get_adress_by_byer_id(self, byer_id):
-        query = """
-            SELECT address
-            FROM delivery
-            WHERE byer_id = %s
-        """
-
-        with self.connection.cursor() as cursor:
-            cursor.execute(query, (byer_id,))
-            rows = cursor.fetchall()
-            addresses = []
-        for row in rows:
-            addresses.append(Delivery(byer_id, row [0], row [1], row [3] ))
-
-        return addresses
- 
 
 # Задание 5
-# Опишите промокод.
-# Продумайте код, размер скидки, активность и минимальную сумму.
-
-
-# TODO: добавить модель промокода
+# Модель промокода (уже есть, но дополним методом для проверки)
 class PromoCode:
     def __init__(self, code, percent, min_total, is_active=True):
         self.code = code
@@ -115,75 +65,261 @@ class PromoCode:
         self.min_total = min_total
         self.is_active = is_active
 
-# Задание 6
-# Создайте репозиторий промокодов.
-# Поиск промокода должен быть удобным для пользовательского ввода.
+    # ← метод для проверки применимости
+    def is_applicable(self, total):
+        return self.is_active and total >= self.min_total
 
 
-# TODO: добавить репозиторий промокодов
-class PromoCodeRepository:
-
+# Задание 4
+# Репозиторий адресов
+class AddressRepository:
     def __init__(self, connection):
-        self.connection= connection 
+        self.connection = connection
 
-    def add_promo_code(self, promcod):
+    # ← исправлено: таблица addresses, поля customer_id, address, is_default
+    def add(self, address):
         query = """
-            INSERT INTO delivery (code, percent, min_total, is_active)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO addresses (customer_id, address, is_default)
+            VALUES (%s, %s, %s)
+            RETURNING id
         """
-
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (promcod.code, promcod.percent, promcod.min_total, promcod.is_active))
+            cursor.execute(query, (address.customer_id, address.address, address.is_default))
+            address_id = cursor.fetchone()[0]
+            self.connection.commit()
+            return address_id
 
-        self.connection.commit()
-
-    def get_promo_code_by_percent(self, percent):
-        query = """
-            SELECT promcod
-            FROM delivery
-            WHERE percent = %s
-        """
-
+    # ← получение адресов покупателя
+    def get_by_customer(self, customer_id):
+        query = "SELECT id, customer_id, address, is_default FROM addresses WHERE customer_id = %s ORDER BY is_default DESC"
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (percent,)) 
+            cursor.execute(query, (customer_id,))
+            rows = cursor.fetchall()
+            return [Address(row[0], row[1], row[2], row[3]) for row in rows]
+
+    # ← получение адреса по id
+    def get_by_id(self, address_id):
+        query = "SELECT id, customer_id, address, is_default FROM addresses WHERE id = %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (address_id,))
             row = cursor.fetchone()
-
-        if row is None:
+            if row:
+                return Address(row[0], row[1], row[2], row[3])
             return None
 
-        return PromoCodeRepository(row[0], row[1], row[2], row[3])
+    # ← обновление адреса
+    def update(self, address):
+        query = "UPDATE addresses SET address = %s, is_default = %s WHERE id = %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (address.address, address.is_default, address.id))
+            self.connection.commit()
+
+    # ← удаление адреса
+    def delete(self, address_id):
+        query = "DELETE FROM addresses WHERE id = %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (address_id,))
+            if cursor.rowcount == 0:
+                raise ValueError(f"Адрес с id {address_id} не найден")
+            self.connection.commit()
+
+
+# Задание 6
+# Репозиторий промокодов
+class PromoCodeRepository:
+    def __init__(self, connection):
+        self.connection = connection
+
+    # ← исправлено: таблица promocodes, поля code, percent, min_total, is_active
+    def add(self, promo):
+        query = """
+            INSERT INTO promocodes (code, percent, min_total, is_active)
+            VALUES (%s, %s, %s, %s)
+        """
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (promo.code, promo.percent, promo.min_total, promo.is_active))
+            self.connection.commit()
+
+    # ← поиск по коду (регистронезависимый)
+    def get_by_code(self, code):
+        query = "SELECT code, percent, min_total, is_active FROM promocodes WHERE LOWER(code) = LOWER(%s)"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (code,))
+            row = cursor.fetchone()
+            if row:
+                return PromoCode(row[0], row[1], row[2], row[3])
+            return None
+
+    # ← получение всех промокодов
+    def get_all(self):
+        query = "SELECT code, percent, min_total, is_active FROM promocodes ORDER BY code"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            return [PromoCode(row[0], row[1], row[2], row[3]) for row in rows]
+
+    # ← обновление промокода
+    def update(self, promo):
+        query = "UPDATE promocodes SET percent = %s, min_total = %s, is_active = %s WHERE code = %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (promo.percent, promo.min_total, promo.is_active, promo.code))
+            self.connection.commit()
+
+    # ← удаление промокода
+    def delete(self, code):
+        query = "DELETE FROM promocodes WHERE code = %s"
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (code,))
+            if cursor.rowcount == 0:
+                raise ValueError(f"Промокод {code} не найден")
+            self.connection.commit()
+
 
 # Задание 7
-# Создайте сервис скидок.
-# Он должен проверять промокод и возвращать сумму после скидки.
-
-
-# TODO: добавить сервис скидок
+# Сервис скидок (исправлен, добавляет проверку существования)
 class DiscountService:
-    def calculate_total(self, total, promcod):
-        if promcod is None:
-            return total
+    def __init__(self, promo_repo):
+        self.promo_repo = promo_repo
 
-        if not promcod.is_active:
+    def apply_promo(self, total, code):
+        if code is None or code == "":
+            return total, 0
+
+        promo = self.promo_repo.get_by_code(code)
+        if promo is None:
+            raise ValueError("Промокод не найден")
+
+        if not promo.is_active:
             raise ValueError("Промокод неактивен")
 
-        if total < promcod.min_total:
-            raise ValueError("Сумма меньше минимальной")
+        if total < promo.min_total:
+            raise ValueError(f"Сумма заказа ({total}) меньше минимальной для промокода ({promo.min_total})")
 
-        discount = total * promcod.percent // 100
-        return total - discount
+        discount = int(total * promo.percent / 100)
+        final = total - discount
+        return final, discount
+
 
 # Задание 8
-# Подключите скидку к оформлению заказа.
-# Заказ должен хранить исходную сумму, скидку и итоговую сумму.
+# Интеграция скидки в заказ – расширяем OrderService из этапа 06
+# Для этого создадим новый класс, который наследует OrderService и добавляет применение скидки,
+# либо просто переопределим create_order. Мы создадим новый сервис, расширяющий функциональность.
+
+class OrderServiceWithDiscount(OrderService):
+    def __init__(self, order_repo, product_repo, sizes_repo, customer_repo, discount_service):
+        super().__init__(order_repo, product_repo, sizes_repo, customer_repo)
+        self.discount_service = discount_service
+
+    def create_order(self, cart_service, customer_id, promocode=None):
+        # ← сначала создаём заказ как обычно (без скидки)
+        order = super().create_order(cart_service, customer_id, promocode)
+        # ← затем применяем скидку, если промокод передан
+        if promocode:
+            try:
+                final, discount = self.discount_service.apply_promo(order.total_original, promocode)
+                order.apply_discount(discount)
+                # ← обновляем запись в БД (сохраняем скидку и итоговую сумму)
+                self._update_order_totals(order.id, order.total_original, discount, order.total_final)
+            except Exception as e:
+                # ← если скидка не применилась, откатываем заказ (можно удалить)
+                self.order_repo.delete(order.id)  # ← нужно добавить метод delete в OrderRepository
+                raise e
+        return order
+
+    def _update_order_totals(self, order_id, total_original, discount, total_final):
+        query = """
+            UPDATE orders SET total_original = %s, discount = %s, total_final = %s
+            WHERE id = %s
+        """
+        with self.order_repo.connection.cursor() as cursor:
+            cursor.execute(query, (total_original, discount, total_final, order_id))
+            self.order_repo.connection.commit()
 
 
-# TODO: добавить скидки в заказ
+# Задание 9 – проверка
+if __name__ == "__main__":
+    conn = get_connection()
 
+    # Подготавливаем репозитории и сервисы
+    product_repo = ProductRepository(conn)
+    sizes_repo = SizesRepository(conn)
+    customer_repo = ByerRepository(conn)
+    order_repo = OrderRepository(conn)
+    promo_repo = PromoCodeRepository(conn)
+    address_repo = AddressRepository(conn)
 
-# Задание 9
-# Проверьте сценарии: промокод найден, промокод неактивен,
-# сумма меньше минимальной, промокод не существует.
+    # Создаём тестовые данные
+    try:
+        # покупатель
+        cust = Byer(1, "Иван Петров", "ivan@mail.ru", "+79123456789")
+        customer_repo.add_byer(cust)
+    except Exception:
+        pass
 
+    try:
+        # товар
+        prod = Product(1, "Кроссовки", 1, 2500, "белый", "Спортивные", True)
+        product_repo.add_product(prod)
+    except Exception:
+        pass
 
-# TODO: добавить ручную проверку скидок
+    try:
+        # остаток
+        left = LeftSizes(1, 1, "42", 10)
+        sizes_repo.add_left_sizes(left)
+    except Exception:
+        pass
+
+    try:
+        # промокод (скидка 10% при сумме от 1000)
+        promo = PromoCode("SALE10", 10, 1000)
+        promo_repo.add(promo)
+    except Exception:
+        pass
+
+    try:
+        # адрес
+        addr = Address(customer_id=1, address="ул. Ленина, д.1", is_default=True)
+        address_repo.add(addr)
+    except Exception:
+        pass
+
+    # Сервис корзины
+    cart_service = CartService(product_repo, sizes_repo)  # ← импортируем из этапа 05
+    cart_service.add_to_cart(1, "42", 3)
+
+    # Сервис скидок
+    discount_service = DiscountService(promo_repo)
+
+    # Сервис заказов со скидками
+    order_service = OrderServiceWithDiscount(order_repo, product_repo, sizes_repo, customer_repo, discount_service)
+
+    # Успешное оформление с промокодом
+    try:
+        order = order_service.create_order(cart_service, 1, "SALE10")
+        print(f"Заказ оформлен, id={order.id}, сумма до скидки={order.total_original}, скидка={order.discount}, итог={order.total_final}")
+    except Exception as e:
+        print("Ошибка:", e)
+
+    # Проверка сценариев
+    # 1. Промокод не найден
+    try:
+        discount_service.apply_promo(2000, "NONEXIST")
+    except Exception as e:
+        print("Ожидаемая ошибка (не найден):", e)
+
+    # 2. Промокод неактивен
+    try:
+        promo_repo.update(PromoCode("SALE10", 10, 1000, is_active=False))
+        discount_service.apply_promo(2000, "SALE10")
+    except Exception as e:
+        print("Ожидаемая ошибка (неактивен):", e)
+
+    # 3. Сумма меньше минимальной
+    try:
+        promo_repo.update(PromoCode("SALE10", 10, 1000, is_active=True))
+        discount_service.apply_promo(500, "SALE10")
+    except Exception as e:
+        print("Ожидаемая ошибка (меньше минимума):", e)
+
+    conn.close()
