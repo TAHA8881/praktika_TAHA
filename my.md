@@ -50,7 +50,11 @@
 
 `git clone https://gitverse.ru/elrdn/python_syntax_practice.git`
 
+`git clone https://github.com/TAHA8881/tasks_for_morozow.git`
+
 ## Дополнительно
+
+git push -u origin main
 
 `Markdown Preview Enhanced`
 
