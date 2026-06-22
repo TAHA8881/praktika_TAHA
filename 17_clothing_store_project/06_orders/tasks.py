@@ -123,13 +123,14 @@ class OrderRepository:
         query = """INSERT INTO orders (customer_id, total_original, discount, total_final, status, promocode_used) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id"""
         
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (                order.customer_id,
+            cursor.execute(query, (                
+                order.customer_id,
                 order.total_original,
                 order.discount,
                 order.total_final,
                 order.status,
-                order.promocode))
-            
+                order.promocode
+                ))
             order_id = cursor.fetchone()[0]
             order.id = order_id
 
@@ -138,10 +139,8 @@ class OrderRepository:
                 cursor.execute( """
                     INSERT INTO order_items (order_id, product_id, product_name, size, price, quantity)
                     VALUES (%s, %s, %s, %s, %s, %s)""", (
-                    item.id,
-                    order.id,
-                    item.clothes_id,                
-                    item.clothes_name,
+                    item.product_id,                
+                    item.product_name,
                     item.size,
                     item.price,
                     item.quantity
@@ -153,7 +152,7 @@ class OrderRepository:
         query="""
             SELECT id, customer_id, total_original, discount, total_final, status, created_at
             FROM orders
-            WHERE user_id %s
+            WHERE customer_id = %s
             ORDER BY created_at DESC
         """
         with self.connection.cursor() as cursor:
@@ -162,21 +161,24 @@ class OrderRepository:
             result = []
             for row in rows:
                 order_dict = {
-                    'id' : row[0],
-                    'user_id' : row[1],
-                    'total_price' : row[2],
-                    'status' : row[3],
-                    'created_at' : row[4],
-                    'items' : self._get_order_items(row[0])
+                     'id': row[0],
+                    'customer_id': row[1],
+                    'total_original': row[2],
+                    'discount': row[3],
+                    'total_final': row[4],
+                    'status': row[5],
+                    'created_at': row[6],
+                    'items': self._get_order_items(row[0])
                 }
                 result.append(order_dict)
             return result
         
     def _get_order_items(self, order_id):
-        query="""
+        query = """
             SELECT id, product_id, product_name, size, price, quantity
             FROM order_items
-                WHERE order_id = s%"""
+                WHERE order_id = %s
+        """
             
         with self.connection.cursor() as cursor:
             cursor.execute(query, (order_id,))
@@ -185,8 +187,8 @@ class OrderRepository:
             return  [
                 {
                     'id' : item[0],
-                    'clothes_id' : item[1],
-                    'clothes_name' : item[2],
+                    'product_id' : item[1],
+                    'product_name' : item[2],
                     'size' : item[3],
                     'price' : item[4],
                     'quantity' : item[5]
@@ -195,21 +197,23 @@ class OrderRepository:
             ]
         
     def get_order_by_id(self, order_id):
-        query="""SELECT id, user_id, total_price, status, created_at
+        query="""SELECT id, customer_id, total_original, discount, total_final, status, created_at
                 FROM orders
-                WHERE id s%"""
+                WHERE id = %s"""
         with self.connection.cursor() as cursor:
             cursor.execute(query, (order_id,))
-            order = cursor.fetchall()
+            row = cursor.fetchone()
 
-        if order_id:
+        if row:
                 return {
-                    'id' : order[0],
-                    'user_id' : order[1],
-                    'total_price' : order[2],
-                    'status' : order[3],
-                    'created_at' : order[4],
-                    'items' : self._get_order_items(order[0])
+                    'id': row[0],
+                    'customer_id': row[1],
+                    'total_original': row[2],
+                    'discount': row[3],
+                    'total_final': row[4],
+                    'status': row[5],
+                    'created_at': row[6],
+                    'items': self._get_order_items(row[0])
                 }
         return None
 
