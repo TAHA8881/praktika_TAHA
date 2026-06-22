@@ -56,6 +56,10 @@
 
 git push -u origin main
 
+
+
+py -m pip install psycopg2-binary pytest
+
 `Markdown Preview Enhanced`
 
 `https://disk.yandex.ru/d/zBwXvpJMJcFnYA`
