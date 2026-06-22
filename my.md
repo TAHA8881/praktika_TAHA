@@ -67,7 +67,20 @@
 `git pull`
 `git stash pop`
 
+Команды для запуска тестов
 
+# Установка pytest (если ещё нет)
+python -m pip install pytest psycopg2-binary
+
+# Запуск всех тестов
+python -m pytest tests/
+
+# Запуск только unit-тестов (исключая интеграционные с БД)
+python -m pytest -m "not integration"
+
+# Запуск с покрытием (установить pytest-cov)
+python -m pip install pytest-cov
+python -m pytest --cov=17_clothing_store_project tests/
 
 
 
