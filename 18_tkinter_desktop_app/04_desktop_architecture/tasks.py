@@ -13,6 +13,8 @@
 
 # TODO: создать класс DesktopApp
 
+import tkinter as tk
+from tkinter import ttk, messagebox
 
 # Задание 2
 # Создайте отдельные классы экранов:
